@@ -143,12 +143,12 @@ module ESearchy
 						project = Project.where({:name => @project.name}).first
 						if args.empty? || args == nil
 							Display.msg "INFORMATION"
-							Display.print "\033[33mProject Name\033[0m\t=\t" + project.name
-							Display.print "\033[33mDomain\033[0m\t\t=\t" + project.domain
-							Display.print "\033[33mWebsite\033[0m\t\t=\t" + project.url
-							Display.print "\033[33mCompany Name\033[0m\t=\t" + project.company
-							Display.print "\033[33mPersons\033[0m\t\t=\t" + project.persons.size.to_s
-							Display.print "\033[33mEmails\033[0m\t\t=\t" + project.emails.size.to_s
+							Display.print Display.yellow + "Project Name" + Display.default + "\t=\t" + project.name
+							Display.print Display.yellow + "Domain" + Display.default + "\t\t=\t" + project.domain
+							Display.print Display.yellow + "Website" + Display.default + "\t\t=\t" + project.url
+							Display.print Display.yellow + "Company Name" + Display.default + "\t=\t" + project.company
+							Display.print Display.yellow + "Persons" + Display.default + "\t\t=\t" + project.persons.size.to_s
+							Display.print Display.yellow + "Emails" + Display.default + "\t\t=\t" + project.emails.size.to_s
 						elsif args[0] =~ /email/
 							Display.msg "EMAIL INFORMATION"
 							project.emails.each do |email|

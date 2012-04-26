@@ -68,21 +68,13 @@ module ESearchy
 
       def project_context
         if @project !=nil
-          if RUBY_PLATFORM =~ /mingw|mswin/
-            " [\e[34m#{@project.name}\e[0m] "
-          else
-            " [\033[34m#{@project.name}\033\[0m] "
-          end
+          " [\e[34m#{@project.name}\e[0m] "
         end
       end
 
   		def context
         if $running_context.nombre != ""
-    			if RUBY_PLATFORM =~ /mingw|mswin/
-    				" (\e[31m#{$running_context.nombre}\e[0m)"
-    			else
-    				" (\033[31m#{$running_context.nombre}\033\[0m)"
-    			end
+    			" (\e[31m#{$running_context.nombre}\e[0m)"
         end
   		end
 
