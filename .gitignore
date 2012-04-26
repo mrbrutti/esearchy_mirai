@@ -16,3 +16,5 @@ tmp
 .yardoc
 _yardoc
 doc/
+esearchy_mirai.sublime*
+.DS_Store
