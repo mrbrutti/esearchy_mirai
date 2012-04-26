@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+require 'getoptlong'
+require "../lib/esearchy"
+
+$debug = false
+
+opts = GetoptLong.new(
+  [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+  [ '--version', '-v', GetoptLong::NO_ARGUMENT ],
+  [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
+  [ '--proxy','-P', GetoptLong::REQUIRED_ARGUMENT ]
+)
+
+opts.each do |opt, arg|
+  case opt
+    when '--help' then
+      # BEGIN OF HELP
+      Display.logo
+      puts "H  E  L  P:\n"
+      puts ""
+      puts "\t--help, -h"
+      puts "\t\tell I guess you know this one."
+      puts ""
+      puts "\t--version, -v"
+      puts "\t\tEsearchy's version"
+      puts ""
+      puts "\t--debug, -d"
+      puts "\t\tUse the interactive shell in debug mode"
+      puts ""
+      puts "\t--proxy, -P [127.0.0.1:8080]"
+      puts "\t\tSetup a proxy."
+      puts ""
+      puts "Copyright 2012 -- FreedomCoder"
+      #END OF HELP
+      exit(0)
+    when '--version' then
+      puts " ESearchy version #{ESearchy::VERSION}"
+      exit(0)
+    # ADD / REMOVE SERVER
+    when '--debug' then
+      $debug = true
+    when '--proxy' then
+      require 'socksify'
+      url, port = arg.split(":")
+      TCPSocket::socks_server = url
+      TCPSocket::socks_port = port.to_i
+    else
+      Display.error "Unknown command. Please try again"
+      exit(0)
+  end
+end
+
+system ("ulimit -s 20000")
+a = ESearchy::UI::Console.new({})
+a.run

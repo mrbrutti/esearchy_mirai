@@ -18,3 +18,4 @@ _yardoc
 doc/
 esearchy_mirai.sublime*
 .DS_Store
+plugin_on_dev

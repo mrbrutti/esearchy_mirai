@@ -1,0 +1,199 @@
+#!/usr/bin/env ruby 
+#  -wKU
+#  esearchy
+#  
+#  Created by FreedomCoder on 2012-3-10.
+#  Copyright 2012 FreedomCoder's Labs. All rights reserved.
+#
+puts "Not yet implemented. come back soon. Use ./esearchy"
+#require 'rubygems'
+#require 'getoptlong'
+#require '../lib/esearchy'
+#
+#$globals = {}
+#opts = GetoptLong.new(
+#  [ '--version',  '-v', GetoptLong::NO_ARGUMENT ],
+#  [ '--help',     '-h', GetoptLong::NO_ARGUMENT ],
+#  [ '--plugins',  '-p', GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--query',    '-q', GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--company',  '-c', GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--website',  '-w', GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--file',     '-f', GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--filter',         GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--output',   '-o', GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--yahookey', '-y', GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--bingkey',  '-b', GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--maxhits',  '-m', GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--proxy',          GetoptLong::REQUIRED_ARGUMENT ],
+#  [ '--profiling',      GetoptLong::NO_ARGUMENT ],
+#}
+#
+#
+#
+#def help_menu
+#  Display.logo
+#  Display.help "\nEsearchy\n"
+#  Display.help "Usage:"
+#  Display.help "./esearchy -q [domain] -p [plugin1,plugin2] ...\n"
+#  Display.help "Arguments:"
+#  Display.help "--help, -h"
+#  Display.help "\tWell I guess you know what this is for (To obtain this Help).\n"
+#  Display.help "--query, -q [@domain.com]"
+#  Display.help "\t The domain name to search.\n"
+#  Display.help "--company, -c [Company Inc]"
+#  Display.help "\t The company name to search.\n"
+#  Display.help "--website, -w [www.domain.com]"
+#  Display.help "\t The website name to spider.\n"
+#  Display.help "--yahookey, -y [key]"
+#  Display.help "\t The Yahoo API Key .\n"
+#  Display.help "--bingkey, -b [key]"
+#  Display.help "\t The Bing API Key .\n"
+#  Display.help "--filter"
+#  Display.help "\t The pattern to use to filter emails.(not fully implemented)\n"
+#  Display.help "--file, -f [file_name] "
+#  Display.help "\tIf we need to search more than one domain we can provide a list.\n"
+#  Display.help "--output, -o"
+#  Display.help "\tThe output file name.\n\n"
+#  Display.help "Plugin Usage:"
+#  Display.help "all"
+#  Display.help "\t Enables all ( Emails and People) searches.\n"
+#  Display.help "people"
+#  Display.help "\t Enables all People searches.\n"
+#  Display.help "emails"
+#  Display.help "\t Enables all Email searches.\n"
+#  Display.help "google"
+#  Display.help "\t Enables Google searches.\n"
+#  Display.help "yahoo"
+#  Display.help "\t Enables Yahoo searches.\n"
+#  Display.help "bing"
+#  Display.help "\t Enables Bing searches.\n"
+#  Display.help "linkedin"
+#  Display.help "\t Enables LinkedIn searches.\n"
+#  Display.help "gprogiles"
+#  Display.help "\t Enables Google Profiles searches.\n"
+#  Display.help "gplus"
+#  Display.help "\t Enables Google Plus searches.\n"
+#  Display.help "naymz"
+#  Display.help "\t Enables Naymz searches.\n"
+#  Display.help "spoke"
+#  Display.help "\t Enables Spoke searches.\n"
+#  Display.help "ggroups"
+#  Display.help "\t Enables Google Groups searches.\n"
+#  Display.help "jigsaw"
+#  Display.help "\t Enables Jigsaw searches.\n"
+#  Display.help "ziggs"
+#  Display.help "\t Enables Ziggs searches.\n"
+#  Display.help "plaxo"
+#  Display.help "\t Enables Plaxo searches.\n"
+#  Display.help "pgp"
+#  Display.help "\t Enables PGP searches.\n"
+#  Display.help "usenet"
+#  Display.help "\t Enables Usenet searches.\n"
+#  Display.help "--profiling"
+#  Display.help "\t Enables People's profiling.\n"
+#  Display.help "--proxy [127.0.0.1:8080]"
+#  Display.help "\t Setup a proxy.\n"
+#  Display.help "Copyright 2012 - FreedomCoder\n"
+#  #END OF HELP
+#  exit(0)
+#end
+#
+#opts.each do |opt, arg|
+#  case opt
+#    when '--version' then
+#      logo
+#      puts "ESearchy Version #{ESearchy::VERSION}" 
+#      exit(1)
+#    when '--help' then
+#      help_menu
+#    when "--plugins"
+#      arg.split(",").each do |engine|
+#        case engine.strip
+#        when 'all' then
+#          @engines = [ :LinkedIn, :Naymz,  :Classmates, :GoogleProfiles, :GooglePlus,
+#                        :Spoke, :JigSaw, :Ziggs, :Plaxo, :Google, :Bing, :Yahoo, 
+#                        :Altavista, :PGP, :Spider ,:Usenet, :GoogleGroups ]
+#        when 'people' then
+#          @engines = [ :LinkedIn, :Naymz, :Classmates, :GoogleProfiles, :GooglePlus,
+#                        :Spoke, :JigSaw, :Ziggs, :Plaxo]
+#        when 'emails' then
+#          @engines = [:Google, :Bing, :Yahoo, :Altavista, :PGP, :Spider ,:Usenet, :GoogleGroups ]
+#        when 'google' then
+#          @engines << :Google
+#        when 'yahoo' then
+#          @engines << :Yahoo
+#        when 'bing' then
+#          @engines << :Bing
+#        when 'altavisa' then
+#          @engines << :Altavista
+#        when 'spider' then
+#          @engines << :Spider
+#        when 'linkedin' then
+#          @engines << :LinkedIn
+#        when 'gprofiles' then
+#          @engines << :GoogleProfiles
+#        when 'gplus' then
+#          @engines << :GooglePlus
+#        when 'naymz' then
+#          @engines << :Naymz
+#        when 'classmates' then
+#          @engines << :Classmates
+#        when 'ggroups' then
+#          @engines << :GoogleGroups
+#        when 'spoke' then
+#          @engines << :Spoke
+#        when 'jigsaw' then
+#          @engines << :JigSaw
+#        when 'ziggs' then
+#          @engines << :Ziggs
+#        when 'plaxo' then
+#          @engines << :Plaxo
+#        when 'pgp' then
+#          @engines << :PGP
+#        when 'usenet' then
+#          @engines << :Usenet
+#        else
+#          # WTF TO DO HERE when custom plugin ????? ARGHH !! 
+#        end
+#      end
+#    when '--profiling' then
+#      @profiling = true
+#    when '--query' then
+#      @params[:query] = arg
+#    when '--company' then
+#      @params[:company] = arg
+#    when '--website' then
+#      @params[:website] = arg
+#    when '--file' then
+#      if File.exists?(arg)
+#        File.open(arg,'r').each_line do |line|
+#          temp[:query],temp[:company],temp[:website] = line.split(',')
+#          @list << temp
+#        end
+#      else
+#        raise ArgumentError, "File not found"
+#        exit(0)
+#      end
+#    when '--yahookey' then
+#      $globals[:yahookey] = arg
+#    when '--bingkey' then
+#      $globals[:bingkey] = arg
+#    when '--filter' then
+#      @pattern = arg
+#    when '--output' then
+#      @output = Output.new arg
+#    when '--maxhits' then
+#      @params[:maxhits] = arg.to_i
+#    when '--proxy' then
+#      require 'socksify'
+#      url, port = arg.split(":")
+#      TCPSocket::socks_server = url
+#      TCPSocket::socks_port = port.to_i
+#    else
+#      puts "Unknown command. Please try again"
+#      exit(0)
+#  end
+#end
+#
+#
+#

@@ -1,0 +1,40 @@
+TODO:
+------------------------------------------------------------------------------------
+* Move to ruby 1.9 and add timeout for open-uri
+
+			#!/usr/bin/ruby1.9
+
+			require 'open-uri'
+
+			open('http://stackoverflow.com', 'r', :read_timeout=>0.01) do |http|
+			  http.read
+			end
+------------------------------------------------------------------------------------
+* Make better identification system for SocialProfiling.
+	 - Check for name and last matches. [ EASY ]
+	 - Check for images name and md5 or some other day. 
+
+------------------------------------------------------------------------------------
+* Implement a good "cancel current run. Need to implement a hook to cancel scans"
+		if $running_context.nombre == ""
+			$running_context.instance_eval(return())
+		else
+		  exit(1)
+		end
+
+	or something like that ..
+
+
+------------
+* NARA records http://aad.archives.gov/aad/display-partial-records.jsp?s=3360&dt=893&tf=F&q=Mike&btnSearch=Search&as_alq=&as_anq=&as_epq=&as_woq=&mtch=11162
+* 
+
+------------
+* pipl ( API pending )
+*  Write plugin to add socialprofiling using Pipl.com services.
+*  Giving limitations it might be a good idea to just Hack their URL results. :)
+
+------------
+* Change BING API to be parsed just like Baidu and Google no more Free API. :(
+*
+
