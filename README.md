@@ -8,7 +8,9 @@ This is where I should put the interesting how-to info, but for now.
 SETUP THE ENVIRONMENT:
 ***
 ruby setup.rb
+
 cd bin
+
 ./esearchy 
 ***
 
