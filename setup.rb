@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'lib/esearchy/helpers/display.rb'
 
-VERSION="2.0.3"
+VERSION="2.0.4"
 
 def gem_available?(name)
    Gem::Specification.find_by_name(name)
