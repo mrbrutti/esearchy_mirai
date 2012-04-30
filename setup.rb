@@ -1,18 +1,43 @@
-require 'rubygems'
-require 'lib/esearchy/helpers/display.rb'
+unless Kernel.respond_to?(:require_relative)
+  module Kernel
+    def require_relative(path)
+      require File.join(File.dirname(caller[0]), path.to_str)
+    end
+  end
+end
 
-VERSION="2.0.4"
+require 'rubygems'
 
 def gem_available?(name)
    Gem::Specification.find_by_name(name)
 rescue Gem::LoadError
-   Display.msg "esearchy requires #{name}."
-   system "sudo gem install #{name}"
+   puts "[*] - esearchy requires #{name}."
+   if  RUBY_PLATFORM =~ /mingw|mswin/
+   	system "gem install #{name}"
+   else
+   	system "sudo gem install #{name}"
+   end
 end
 
+if  RUBY_PLATFORM =~ /mingw|mswin/
+	puts "[*] - If windows need to install win32console Gem."
+  gem_available? 'win32console'
+end
+
+require_relative 'lib/esearchy/helpers/display.rb'
+
+VERSION="2.0.4"
+
+
 def mongo_download(os,platform)
-	Display.msg "Downloading mongodb-#{os}-#{platform}-#{VERSION}.tgz"
-	system("curl http://fastdl.mongodb.org/osx/mongodb-#{os}-#{platform}-#{VERSION}.tgz > external/mongodb.tgz")
+	case os
+	when /linux|osx/
+		Display.msg "Downloading mongodb-#{os}-#{platform}-#{VERSION}.tgz"
+		system("curl http://fastdl.mongodb.org/#{os}/mongodb-#{os}-#{platform}-#{VERSION}.tgz > external/mongodb.tgz")
+	when /win32/
+		Display.msg "Downloading mongodb-#{os}-#{platform}-#{VERSION}.zip" 
+		system("external/tools/wget.exe -O external\\mongodb.zip http://fastdl.mongodb.org/#{os}/mongodb-#{os}-#{platform}-#{VERSION}.zip")
+	end
 end
 
 def mongo_install(os)
@@ -24,8 +49,11 @@ def mongo_install(os)
 		Display.msg "Removing downloaded file"
 		system("rm external/mongodb.tgz")
 	when /mingw|mswin/
-		Display.error "WINDOWS USERS HAVE TO MANNUALLY DECOMPRESS AND MOVE mongodb.tgz into external/mongdb"
-		Display.error "SORRY: if you want to do it and send me a patch you are welcomed."
+		Display.msg "Decompressing mongodb"
+		system("external/tools/unzip.exe external\\mongodb*.zip -d external")
+		system("move external\\mongodb-* external\\mongodb")
+		Display.msg "Removing downloaded file"
+		system("del external\\mongodb.zip")
 	end
 end
 
@@ -92,7 +120,7 @@ Display.msg "-<[ ESearchy 0.3 CodeName Miata ]>-"
 Display.msg "-<[ Setup and Configurations script ]>-"
 
 Display.msg "Missing Gem installation"
-gem_available? "sinatra"
+#gem_available? "sinatra"
 gem_available? "mongo"
 gem_available? "bson_ext"
 gem_available? "mongo_mapper"
@@ -100,14 +128,11 @@ gem_available? "mongo_mapper"
 gem_available? 'json'
 gem_available? 'zip'
 #gem_available? 'uri'
-gem_available? 'pdf_reader'
+#gem_available? 'pdf_reader'
 gem_available? 'nokogiri'
 gem_available? 'readline-history-restore'
 gem_available? 'spidr'
 
-if  RUBY_PLATFORM =~ /mingw|mswin/
-  gem_available? 'win32console'
-end
 
 Display.msg "Installing mongodb"
 mongo_install?

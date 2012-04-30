@@ -10,7 +10,7 @@ require 'digest/sha2'
 require 'json'
 require 'zip/zip'
 require 'zip/zipfilesystem'
-require 'pdf/reader'
+#require 'pdf/reader'
 require 'mongo_mapper'
 require 'spidr'
 
@@ -23,7 +23,7 @@ end
 PATH = '../lib/esearchy/'
 #ESEARCHY REQUIRES
 ['db/db','db/mapper', 'helpers/display', 'helpers/useragent', 'helpers/search','esearchy', 'baseplugin',
-  'ui/common', 'ui/commandparser', 'ui/command/project', 'ui/command/person','ui/console', 'parsers/people', 'parsers/email'].each {|x| require PATH + x }
+  'ui/common', 'ui/commandparser', 'ui/command/project', 'ui/command/person','ui/console', 'parsers/people', 'parsers/email'].each {|x| require_relative PATH + x }
 
 
 # Monkey Patching to shorten timeout of open uri
