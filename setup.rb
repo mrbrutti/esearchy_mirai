@@ -6,8 +6,18 @@ unless Kernel.respond_to?(:require_relative)
   end
 end
 
-require 'rubygems'
+case RUBY_PLATFORM
+when /mingw|mswin/
+	@slash = "\\"
+else
+	@slash = "/"
+end
 
+VERSION="2.0.4"
+require 'rubygems'
+require 'readline'
+
+# CHECK FOR GEMS HACK METHOD
 def gem_available?(name)
    Gem::Specification.find_by_name(name)
 rescue Gem::LoadError
@@ -19,6 +29,11 @@ rescue Gem::LoadError
    end
 end
 
+puts "-<[ ESearchy 0.3 CodeName Miata ]>-"
+puts "-<[ Setup and Configurations script ]>-"
+puts ""
+puts "[*] - Missing Gem installation"
+
 if  RUBY_PLATFORM =~ /mingw|mswin/
 	puts "[*] - If windows need to install win32console Gem."
   gem_available? 'win32console'
@@ -26,9 +41,9 @@ end
 
 require_relative 'lib/esearchy/helpers/display.rb'
 
-VERSION="2.0.4"
 
 
+# MONGO METHODS
 def mongo_download(os,platform)
 	case os
 	when /linux|osx/
@@ -57,10 +72,22 @@ def mongo_install(os)
 	end
 end
 
+def mongo_install_service
+	# runas /user:Administrator "external\mongodb\bin\mongod --install --dbpath=C:\Users\matt\.esearchy\data\db --logpath=C:\Users\matt\.esearchy\logs\mongodb.logs--logappend --serviceName=MONGODB"
+	mongod = "external/mongodb/bin/mongod --install"
+	dblogs = ENV['HOME'] + "/.esearchy/logs/mongodb.logs"
+	dbpath = ENV['HOME'] + "/.esearchy/data/db"
+	cmd = (mongod + " --dbpath=\"" + dbpath + "\" --logpath=\"" + dblogs + "\" --logappend --serviceName MONGODB").gsub("/",@slash)
+	system("external\\tools\\Elevate.exe " + cmd )
+	sleep(1)
+rescue
+	Display.error "Something went wrong installing MongoDB as a service."
+end
+
 def mongo_install?
-	unless File.exists? File.expand_path File.dirname(__FILE__) + "external"
+	unless File.exists?((File.expand_path File.dirname(__FILE__) + "external").gsub("/",@slash))
 		system("mkdir external")
-		unless File.exists? File.expand_path File.dirname(__FILE__) + "external/mongodb"
+		unless File.exists?((File.expand_path File.dirname(__FILE__) + "external/mongodb").gsub("/",@slash))
 			case RUBY_PLATFORM
 			when /linux/
 				Display.msg "IMPORTANT: curl must be installed and on $PATH."
@@ -84,15 +111,17 @@ def mongo_install?
 	end
 end
 
+# CHECK FOR BASIC CONFIG STRUCTURE METHOD
+# TODO: Might need to implement a few changes here for Windows.
 def configure_esearchy
   #Check & create folders
-  unless File.exists? ENV["HOME"] + "/.esearchy"
+  unless File.exists?((ENV["HOME"] + "/.esearchy").gsub("/",@slash))
     Display.msg "Running for the first time."
     Display.msg "Generating environment"
-    system("mkdir " + ENV["HOME"] + "/.esearchy")
+    system(("mkdir " + ENV["HOME"] + "/.esearchy").gsub("/",@slash))
   end
-  unless File.exists? ENV["HOME"] + "/.esearchy/config"
-  	File.open(ENV['HOME'] + "/.esearchy/config", "w" ) do |line|
+  unless File.exists?((ENV["HOME"] + "/.esearchy/config").gsub("/",@slash))
+  	File.open((ENV['HOME'] + "/.esearchy/config").gsub("/",@slash), "w" ) do |line|
       # A few defaults. Although this can all be overwritten at runtime. 
       line << " { \"maxhits\" : 1000,\n"
       line << " \"yahookey\" : \"AwgiZ8rV34Ejo9hDAsmE925sNwU0iwXoFxBSEky8wu1viJqXjwyPP7No9DYdCaUW28y0.i8pyTh4\",\n" 
@@ -102,24 +131,21 @@ def configure_esearchy
       line << " \"dbname\" : \"esearchy\"\n }"
 	end
   end
-  unless File.exists? ENV["HOME"] + "/.esearchy/data"
-    system("mkdir " + ENV["HOME"] + "/.esearchy/data")
-    unless File.exists? ENV["HOME"] + "/.esearchy/data/db"
-      system("mkdir " + ENV["HOME"] + "/.esearchy/data/db")
+  unless File.exists?((ENV["HOME"] + "/.esearchy/data").gsub("/",@slash))
+    system(("mkdir " + ENV["HOME"] + "/.esearchy/data").gsub("/",@slash))
+    unless File.exists?((ENV["HOME"] + "/.esearchy/data/db").gsub("/",@slash))
+      system(("mkdir " + ENV["HOME"] + "/.esearchy/data/db").gsub("/",@slash))
     end
   end
-  unless File.exists? ENV["HOME"] + "/.esearchy/plugins"
-    system("mkdir " + ENV["HOME"] + "/.esearchy/plugins")
+  unless File.exists?((ENV["HOME"] + "/.esearchy/plugins").gsub("/",@slash))
+    system(("mkdir " + ENV["HOME"] + "/.esearchy/plugins").gsub("/",@slash))
   end
-  unless File.exists? ENV["HOME"] + "/.esearchy/logs"
-    system("mkdir " + ENV["HOME"] + "/.esearchy/logs")
+  unless File.exists?((ENV["HOME"] + "/.esearchy/logs").gsub("/",@slash))
+    system(("mkdir " + ENV["HOME"] + "/.esearchy/logs").gsub("/",@slash))
   end
 end
 
-Display.msg "-<[ ESearchy 0.3 CodeName Miata ]>-"
-Display.msg "-<[ Setup and Configurations script ]>-"
 
-Display.msg "Missing Gem installation"
 #gem_available? "sinatra"
 gem_available? "mongo"
 gem_available? "bson_ext"
@@ -139,6 +165,11 @@ mongo_install?
 
 Display.msg "Setup esearchy initial configuration"
 configure_esearchy
+
+if RUBY_PLATFORM =~ /mingw|mswin/
+	Display.msg "Installing mongodb as service"
+	mongo_install_service
+end
 
 
 

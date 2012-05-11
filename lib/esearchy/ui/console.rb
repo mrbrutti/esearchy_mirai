@@ -1,5 +1,5 @@
 require 'readline'
-require 'readline/history/restore'
+require 'readline/history/restore'  unless RUBY_PLATFORM =~ /mingw|mswin/
 
 module ESearchy
 	module UI
@@ -24,8 +24,8 @@ module ESearchy
 	  		common_commands = %w{project new open save close help use run options set} + 
 	  		                  %w{back exit show options globals constants edit list load } +
 	  		                  %w{name domain url company person name middle last email emails } + 
-	  		                  %w{persons start stop nickname format export} +
-	  		                  ESearchy::PLUGINS.each_key.map
+	  		                  %w{persons start stop nickname format export}
+	  		ESearchy::PLUGINS.each_key {|p| common_commands << p}
 
 	  		comp = proc do |s| 
 	        case s
@@ -38,7 +38,7 @@ module ESearchy
 
 	      Readline.completion_append_character = " "
 	      Readline.completion_proc = comp
-        Readline::History::Restore.new(ENV["HOME"] + "/.esearchy/.esearchy_console_history", :history_limit => 100)
+        Readline::History::Restore.new(ENV["HOME"] + "/.esearchy/.esearchy_console_history", :history_limit => 100)  unless RUBY_PLATFORM =~ /mingw|mswin/
 
   		end
       attr_accessor :options

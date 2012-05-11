@@ -2,11 +2,17 @@ module ESearchy
 	module DB
 		def self.start
 			Display.msg "Starting MongoDB"
-			mongod = File.expand_path File.dirname(__FILE__) + "../../../../external/mongodb/bin/mongod --fork"
-			dblogs = ENV['HOME'] + "/.esearchy/logs/mongodb.logs"
-			dbpath = ENV['HOME'] + "/.esearchy/data/db"
-			system( mongod + " --dbpath=" + dbpath + " --logpath=" + dblogs)
-			sleep(1)
+			case RUBY_PLATFORM
+			when /linux|darwin/
+				mongod = File.expand_path File.dirname(__FILE__) + "../../../../external/mongodb/bin/mongod --fork"
+				dblogs = ENV['HOME'] + "/.esearchy/logs/mongodb.logs"
+				dbpath = ENV['HOME'] + "/.esearchy/data/db"
+				system( mongod + " --dbpath=" + dbpath + " --logpath=" + dblogs + "--logappend")
+				sleep(1)
+			when /mingw|mswin/
+				system("..\\external\\tools\\Elevate.exe NET START \"MONGODB\"")
+				sleep(1)
+			end
 		rescue
 			Display.error "Something went wrong starting db"
 			exit(0)
@@ -23,6 +29,7 @@ module ESearchy
 
 		def self.stop
 			MongoMapper.connection['admin'].command(:shutdown => 1)
+			system("..\\external\\tools\\Elevate.exe NET STOP \"MONGODB\"") if RUBY_PLATFORM =~ /mingw|mswin/
 		rescue
 			Display.error "Looks like there is nothing to shutdown"
 		end

@@ -1,5 +1,10 @@
 TODO:
+
 ------------------------------------------------------------------------------------
+* require_relative [DONE]
+* setup works on windows [ DONE ]
+* basic windows installation [ DONE ]
+* Mongo DB start/stop [ DONE ]
 * Move to ruby 1.9 and add timeout for open-uri
 
 			#!/usr/bin/ruby1.9
