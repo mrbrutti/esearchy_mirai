@@ -7,7 +7,7 @@ module ESearchy
 				mongod = File.expand_path File.dirname(__FILE__) + "../../../../external/mongodb/bin/mongod --fork"
 				dblogs = ENV['HOME'] + "/.esearchy/logs/mongodb.logs"
 				dbpath = ENV['HOME'] + "/.esearchy/data/db"
-				system( mongod + " --dbpath=" + dbpath + " --logpath=" + dblogs + "--logappend")
+				system( mongod + " --dbpath=" + dbpath + " --logpath=" + dblogs + " --logappend")
 				sleep(1)
 			when /mingw|mswin/
 				system("..\\external\\tools\\Elevate.exe NET START \"MONGODB\"")
