@@ -128,7 +128,14 @@ def configure_esearchy
       line << "\"bingkey\" : \"220E2E31383CA320FF7E022ABBB8B9959F3C0CFE\",\n"
       line << "\"dburl\" : \"localhost\",\n"
 	    line << "\"dbport\" : 27017,\n"
-      line << " \"dbname\" : \"esearchy\"\n }"
+      line << " \"dbname\" : \"esearchy\"\n,"
+      case RUBY_PLATFORM
+      when /linux|darwin/
+      	line << " \"editor\" : \"vim\"\n"
+      when /mingw|mswin/
+      	line << " \"editor\" : \"notepad.exe\"\n"
+      end
+      line << "}"
 	end
   end
   unless File.exists?((ENV["HOME"] + "/.esearchy/data").gsub("/",@slash))

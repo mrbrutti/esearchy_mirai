@@ -61,11 +61,9 @@ module ESearchy
 			
 			end
 			
-
 			#
-			# Command: show
-			# Description: This should show globals options, instance options, plugin options.
-			# and plugion constants
+			# Command: use
+			# Description: Command to actually open a plugin. 
 			#
 			def cmd_use(args)
 				begin
@@ -81,9 +79,8 @@ module ESearchy
 			end
 			
 			#
-			# Command: show
-			# Description: This should show globals options, instance options, plugin options.
-			# and plugion constants
+			# Command: run
+			# Description: Meta command used to start running a plugin.
 			#
 			def cmd_run(args)
 				begin
@@ -93,7 +90,7 @@ module ESearchy
 				    $running_context.run
 			    end
 				rescue Exception => e
-  				Display.error "Something went wrong loading the plugin." + e
+  				Display.error "Something went wrong loading the plugin. #{e}"
   			end
   		end
 			#
@@ -131,76 +128,13 @@ module ESearchy
 					Display.hash(options)
 				else
 					search_terms = keys.join("|").to_s
-					Display.hash(options.select {|k,v| k.to_s.match(/#{search_terms}/i) != nil || v.to_s.match(/#{search_terms}/i) != nil })
+					Display.hash(options.select { |k,v| k.to_s.match(/#{search_terms}/i) != nil || v.to_s.match(/#{search_terms}/i) != nil })
 				end
 			end
 
 			#
-			# Command: set
-			# Description: This should set instance options, plugin options.
-			#
-			def cmd_set(args)
-				begin
-					$running_context.options[args[0].to_sym] = args[1..-1].join(" ")
-				rescue Exception => e
-					Display.error "Something went wrong running the command." + e
-				end
-			end
-
-			#
-			# Command: show
-			# Description: This should show globals options, instance options, plugin options.
-			# and plugion constants
-			#
-			def cmd_help(args)
-				begin
-					if args == nil || args == []
-						$running_context.help
-					else
-						plugin_name = args[0]
-						ESearchy::PLUGINS[plugin_name].help
-					end
-				rescue Exception => e
-					Display.error "Something went wrong running the command." + e
-				end 
-			end
-
-			#
-			# Command: back
-			# Description: This is used to get out of a plugin and go back to main.
-			#
-			def cmd_back(args)
-				$running_context =  self
-			end
-
-			#
-			# Command: exit
-			# Description: Just a container fo exit_app.
-			#
-			def cmd_exit(args)
-				exit_app
-			end
-
-			#
-			# Command: exit_app
-			# Description: Confirmation method to exit app
-			#
-			def exit_app
-      	Display.warn "Are you sure you want to quit EMaily? [yes/no] "
-      	if $stdin.gets.strip == "yes"
-      		#Display.warn "Do you want to stop the database? [yes/no] "
-      		#if $stdin.gets.strip == "yes"
-      			ESearchy::DB.stop
-      		#end
-      		$running_context
-      		Kernel.exit(1)
-      	end
-      end
-
-			#
-			# Command: show
-			# Description: This should show globals options, instance options, plugin options.
-			# and plugion constants
+			# Command: reload
+			# Description: This should reload all of the plugins or globals or both. 
 			#
 			def cmd_reload(args)
 				begin
@@ -226,12 +160,79 @@ module ESearchy
 				end 
 			end
 
-
 			#
-			# Command: show
-			# Description: This should show globals options, instance options, plugin options.
-			# and plugion constants
-			#			
+			# Command: help
+			# Description: yeap, the almighty help. :)
+			#
+			def cmd_help(args)
+				begin
+					Display.msg "HELP"
+					if args == nil || args == []
+						Display.msg "Commands"
+						help_commands
+						Display.help "TODO"
+						Display.msg "Plugins"
+						if $running_context.nombre == ""
+							ESearchy::PLUGINS.each_value {|v| v.new.help }
+						else
+							$running_context.help
+						end
+					else
+						plugin_name = args[0].downcase
+						ESearchy::PLUGINS[plugin_name].new.help
+					end
+				rescue Exception => e
+					Display.error "Something went wrong running the command." + e
+				end 
+			end
+
+			def help_commands()
+				Display.help ""
+				Display.help "  help <plugin>"
+				Display.help ""
+				Display.help " 	project"
+				Display.help "   |------> new <name>"
+				Display.help "   |------> open <name>"
+				Display.help "   |------> save"
+				Display.help "   |------> close"
+				Display.help "   |------> info"
+				Display.help "   |------> info [emails|persons]"
+				Display.help ""
+				Display.help "  use <plugin>"
+				Display.help "   |"
+				Display.help "   |------> help"
+				Display.help "   |------> run"
+				Display.help "   |------> show options"
+				Display.help "   |------> set <key> <val>"
+				Display.help "   |------> back"
+				Display.help ""
+				Display.help "  show"
+				Display.help "   |------> options [key] "
+				Display.help "   |------> globals [key]"
+				Display.help ""
+				Display.help "  set <key> <val>"
+				Display.help ""
+				Display.help "  search [term|term2]"
+				Display.help ""
+				Display.help "  edit"
+				Display.help "   |------> plugins <name>"
+				Display.help "   |------> globals"
+				Display.help ""
+				Display.help "  list"
+				Display.help "   |------> plugins"
+				Display.help ""
+				Display.help "  reload"
+				Display.help "   |------> plugins"
+				Display.help ""
+				# [ TODO ] Display.help "  export"
+				# [ TODO ] Display.help "   |------> html"
+				# [ TODO ] Display.help "   |------> pdf"
+				# [ TODO ] Display.help "   |------> csv"
+				# [ TODO ] Display.help "  search <plugins>"
+				# [ TODO ] Display.help "  load <plugin>"
+				# [ TODO ] Display.help "  exit"
+				Display.help " "
+		end
 			def cmd_list(args)
 				begin
 					if args == []
@@ -251,9 +252,8 @@ module ESearchy
 				end 
 			end
 			
-			def self.method_missing(method_sym, *arguments, &block)
-			  Display.error "Command #{method_sym} does not exists."
-		  end
+
+
 			#
 			# Command: show
 			# Description: This should show globals options, instance options, plugin options.
@@ -315,6 +315,56 @@ module ESearchy
 					Display.error "Something went wrong running the command." + e
 				end
 			end
+			#
+			# Command: set
+			# Description: This should set instance options, plugin options.
+			#
+			def cmd_set(args)
+				begin
+					$running_context.options[args[0].to_sym] = args[1..-1].join(" ")
+				rescue Exception => e
+					Display.error "Something went wrong running the command." + e
+				end
+			end
+
+			#
+			# Command: back
+			# Description: This is used to get out of a plugin and go back to main.
+			#
+			def cmd_back(args)
+				$running_context =  self
+			end
+
+			#
+			# Command: exit
+			# Description: Just a container fo exit_app.
+			#
+			def cmd_exit(args)
+				exit_app
+			end
+
+			#
+			# Command: exit_app
+			# Description: Confirmation method to exit app
+			#
+			def exit_app
+      	Display.warn "Are you sure you want to quit EMaily? [yes/no] "
+      	if $stdin.gets.strip == "yes"
+      		#Display.warn "Do you want to stop the database? [yes/no] "
+      		#if $stdin.gets.strip == "yes"
+      			ESearchy::DB.stop
+      		#end
+      		$running_context
+      		Kernel.exit(1)
+      	end
+      end
+      #
+      # Command: NONE
+      # This should handle the non-existant methods. 
+      #
+      def self.method_missing(method_sym, *arguments, &block)
+			  Display.error "Command #{method_sym} does not exists."
+		  end
 		end
 	end
 end

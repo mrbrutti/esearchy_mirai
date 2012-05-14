@@ -23,13 +23,11 @@ module ESearchy
     end
 
     def self.help
-      Display.msg "HELP"
       Display.help @info[:name]
       Display.help "\t" + @info[:desc]
     end
 
     def help
-      Display.msg "HELP"
       Display.help @info[:name]
       Display.help "\t" + @info[:desc]
     end

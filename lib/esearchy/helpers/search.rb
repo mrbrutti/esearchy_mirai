@@ -118,59 +118,11 @@ module ESearchy
   end
 end 
 
-#      private    
-#     def get(url, port, querystring = "/", headers = {}, limit = 10, &block)
-#       http = Net::HTTP.new(url,port)
-#       begin
-#         http.start do |http|
-#           request = Net::HTTP::Get.new(querystring, headers)
-#           response = http.request(request)
-#           case response
-#           when Net::HTTPSuccess
-#             block.call(response)
-#           when Net::HTTPRedirection
-#             get(URI.parse(response['location']).host, 
-#                 URI.parse(response['location']).port.to_i,
-#                 querystring, headers, limit - 1, &block)
-#           else
-#             return response.error!
-#           end
-#         end
-#       rescue Net::HTTPFatalError
-#         D "Error: Something went wrong with the HTTP request"
-#       rescue Net::HTTPServerException
-#         D "Error: Something went wrong with the HTTP request"
-#       rescue 
-#         D "Error: Something went wrong :( + #{$!}"
-#       end
-#     end
-#             
-#     def header
-#       begin
-#         return self.class::OPTS[:header]
-#       rescue
-#         return {'User-Agent' => UserAgent::fetch}
-#       end
-#     end
-#     
-#     
-#     def total
-#       @options[:stop] > @options[:results] ? @options[:results] : @options[:start]
-#     end
-#     
-#     def parse(object)
-#       case object
-#       when Array
-#         parse_html object
-#       when Json
-#         parse_json object
-#       end
-#     end
 #         
 #     def document?(url)
 #       url.scan(/(.pdf$|.doc$|.docx$|.xlsx$|.pptx$|.odt$|.odp$|.ods$|.odb$|.txt$|.rtf$|.ans$|.csv$)/i) == [] ? false :true
 #     end
-
+#
 #     def parse_html ( array )
 #       array.each do |a|
 #         case a[0]
@@ -200,41 +152,3 @@ end
 #       end
 #     end
 #     
-#     def crawler(text)
-#       self.class::TYPE < 2 ? crawl_emails(text) : crawl_people(text)
-#     end
-#         
-#     def crawl_emails(text)
-#       list = text.scan(/[a-z0-9!#$&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$&'*+=?^_`{|}~-]+)*_at_\
-#?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z](?:[a-z-]*[a-z])?|\
-#a-z0-9!#$&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$&'*+=?^_`{|}~-]+)*\sat\s(?:[a-z0-9](?:[a-z0-9-]\
-#[a-z0-9])?\.)+[a-z](?:[a-z-]*[a-z])?|[a-z0-9!#$&'*+=?^_`{|}~-]+\
-#?:\.[a-z0-9!#$&'*+=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z](?:[a-z-]*[a-z])?|\
-#a-z0-9!#$&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$&'*+=?^_`{|}~-]+)*\s@\s(?:[a-z0-9](?:[a-z0-9-]*\
-#a-z0-9])?\.)+[a-z](?:[a-z-]*[a-z])?|[a-z0-9!#$&'*+=?^_`{|}~-]+(?:\sdot\s[a-z0-9!#$&'*+=?^_`\
-#|}~-]+)*\sat\s(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\sdot\s)+[a-z](?:[a-z-]*[a-z])??/i)
-#       #print_(list)
-#       c_list = fix(list)
-#       @emails.concat(c_list).uniq!
-#       c_list.zip do |e| 
-#         @results << [e[0], "E", "",self.class.to_s.upcase, 
-#             e[0].downcase.match(/#{CGI.unescape(@query).gsub("@","").split('.')[0]}/) ? "T" : "F"]
-#       end
-#     end
-# 
-#     def fix(list)
-#       list.each do |e|
-#         e.gsub!(" at ","@")
-#         e.gsub!("_at_","@")
-#         e.gsub!(" dot ",".")
-#         e.gsub!(/[+0-9]{0,3}[0-9()]{3,5}[-]{0,1}[0-9]{3,4}[-]{0,1}[0-9]{3,5}/,"")
-#       end
-#     end
-#     
-#     def help
-#       raise "This is just a container. Help should be define in your plugin."
-#     end
-
-#     def crawl_people(text)
-#       raise "This is just a container"
-#     end
