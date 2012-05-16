@@ -2,7 +2,7 @@ module ESearchy
   module Profiling
     class SocialProfiling < ESearchy::BasePlugin
       include ESearchy::Helpers::Search
-      include ESearchy::Parsers::People
+      include ESearchy::Parsers::Email
 
       ESearchy::PLUGINS[self.name.split("::")[-1].downcase] = self
       
@@ -14,13 +14,14 @@ module ESearchy
           :desc => "Parses Ziggs using Google Searches that match.",
           # URL/page,data of engine or site to parse
           :engine => "www.google.com",
+          :author => "Matias P. Brutti <FreedomCoder>", 
           # Port for request
           :port => 80,
           # Max number of searches per query. 
           # This is usually the max entries for most search engines.
           :num => 100,
           #TYPE 1 searches emails / TYPE 2 Searches people / TYPE 3 Profiling and Operations with data.
-          :type => 2
+          :type => 3
         }
         super options
       end

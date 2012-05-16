@@ -293,12 +293,13 @@ module ESearchy
 					if args == nil || args == []
 						Display.error "Need to provide an argument [globals|plugins]"
 					else
+						RUBY_PLATFORM =~ /mingw|mswin/ ? slash = "\\" : slash = "/" 
 						case args[0]
 						when /plugin[s]*/i
 							if args.size > 1
 								filename = args[1..-1].join(" ").to_s
-								if File.exists? ENV["HOME"] + "/.esearchy/plugins/" + filename
-									filename = ENV["HOME"] + "/.esearchy/plugins/" + filename
+								if (File.exists? ENV["HOME"] + "/.esearchy/plugins/" + filename).gsub("/",slash)
+									filename = (ENV["HOME"] + "/.esearchy/plugins/" + filename).gsub("/",slash)
 									system( $globals[:editor] + " " + filename )
 									load filename
 								else

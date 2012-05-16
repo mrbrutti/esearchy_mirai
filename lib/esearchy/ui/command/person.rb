@@ -91,7 +91,7 @@ module ESearchy
 				Display.print "\e[33mFound in:\e[0m #{person.found_at}"
 				Display.print "\e[33mEmails:\e[0m "
 				person.emails.each do |email|
-					Display.print "\t#{email}"
+					Display.print "\t\e[33mEmail:\e[0m #{email.email}\t\e[33mFound by:\e[0m  #{email.found_by}"
 				end
 				Display.print "\e[33mNetworks:\e[0m "
 				person.networks.each do |network|

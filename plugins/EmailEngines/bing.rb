@@ -14,6 +14,7 @@ module ESearchy
           :desc => "Parses Bing Searches for emails addresses that match query",
           # URL/page,data of engine or site to parse
           :engine => "www.bing.com",
+          :author => "Matias P. Brutti <FreedomCoder>", 
           # Port for request
           :port => 80,
           # Max number of searches per query. 

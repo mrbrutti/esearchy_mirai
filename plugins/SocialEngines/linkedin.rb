@@ -14,6 +14,7 @@ module ESearchy
           :desc => "Parses LinkedIn using Google Searches that match.",
           # URL/page,data of engine or site to parse
           :engine => "www.google.com",
+          :author => "Matias P. Brutti <FreedomCoder>",       
           # Port for request
           :port => 80,
           # Max number of searches per query. 

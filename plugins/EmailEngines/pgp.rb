@@ -14,6 +14,7 @@ module ESearchy
           # URL/page,data of engine or site to parse
           :engine => "pgp.mit.edu",
           # Port for request
+          :author => "Matias P. Brutti <FreedomCoder>", 
           :port => 11371,
           # Max number of searches per query. 
           # This is usually the max entries for most search engines.
