@@ -35,16 +35,23 @@ module ESearchy
             if @options[:domain] != ""
               if @options[:length_n].class == Range && @options[:length_l].class == Range          
                 @project.persons.each do |person|
-                  Display.msg "[Generating email] - " + person.name + " " + person.last
+                  Display.msg "[Generating email] -> " + person.name + " " + person.last
                   if @options[:first] == "NAME"
                     email = person.name[@options[:length_n]] + @options[:spliter] + person.last[@options[:length_l]] + "@"  + @options[:domain]
-                  else
+                  elsif @options[:first] == "LAST"
                     email = person.name[@options[:length_l]] + @options[:spliter] + person.last[@options[:length_n]] + "@"  + @options[:domain]
+                  else
+                    raise "Non supported :first option [#{@options[:first]}]"
+                  end 
+                  if email_exist?(email)
+                    Display.msg "[EmailGenerator] + " + email
+                    person.emails << Email.new({ :email => email, :url => person.found_at, :found_by => @info[:name] })
+                    person.save!
+                    person.save
+                    @project.save
+                  else
+                    Display.msg "[EmailGenerator] = " + email
                   end
-                  person.emails << Email.new({ :email => email, :url => person.found_at, :found_by => @info[:name] })
-                  person.save!
-                  person.save
-                  @project.save
                 end
               else
                 Display.error "Either name or last options are not a proper range."

@@ -1,41 +1,10 @@
 module ESearchy
 	module UI
 		module CommandParser
-			#  project
-			#   |------> new
-			#   |------> open
-			#   |------> save
-			#   |------> close
 			#
-			#  help 
-			#  use <plugin>
-			#   |
-			#   |------> help
-			#   |------> run
-			#   |------> options
-			#   |------> set <key> <val>
-			#   |------> back
+			# Command: Meta_cmd 
+			# Description: This is the meta handler for all commands. 
 			#
-			#  show
-			#   |-> options <key> 
-			#   |-> globals <key>
-			#
-			#  set <key> <val>  // used to manage runtime @options
-			#  edit  // uses vim.
-			#   |------> plugins <name>
-			#   |------> globals
-			# 
-			#  list
-			#   |------> plugins
-			#
-			#  export
-			#   |------> html
-			#   |------> pdf
-			#   |------> csv
-			#  search <plugins>
-			#  load <plugin>
-			#  exit
-			#  
 			def run_cmd(method, arguments)
 			  if self.respond_to?("cmd_"+ method)
 				self.send("cmd_"+ method, arguments || [])
