@@ -14,6 +14,7 @@ module ESearchy
           :desc => "Parses Baidu Searches for emails addresses that match query",
           # URL/page,data of engine or site to parse
           :engine => "www.baidu.com",
+          :help => "",
           :author => "Matias P. Brutti <FreedomCoder>", 
           # Port for request
           :port => 80,
@@ -36,22 +37,26 @@ module ESearchy
       end
             
       def parse( results )
+        ts = []
         results.each do |result|
-          begin
-            emails_in_text(result[:content]).concat(emails_in_url(result[:url])).each do |correo|
-              if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
-                if email_exist?(@project.emails, correo)
-                  @project.emails << Email.new({:email => correo, :url => result[:url], :found_by => @info[:name]})
-                  @project.save!
-                  Display.msg "[Baidu] + " + correo
-                else
-                  Display.msg "[Baidu] = " + correo
+          ts << Thread.new {
+            begin
+              emails_in_text(result[:content]).concat(emails_in_url(result[:url])).each do |correo|
+                if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
+                  if email_exist?(@project.emails, correo)
+                    @project.emails << Email.new({:email => correo, :url => result[:url], :found_by => @info[:name]})
+                    @project.save!
+                    Display.msg "[Baidu] + " + correo
+                  else
+                    Display.msg "[Baidu] = " + correo
+                  end
                 end
               end
+            rescue Exception => e
+              Display.debug "Something went wrong." + e
             end
-          rescue Exception => e
-            Display.debug "Something went wrong." + e
-          end
+          }
+          ts.each {|t| t.join }
         end
       end
     end

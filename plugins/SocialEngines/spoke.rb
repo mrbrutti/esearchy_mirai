@@ -14,6 +14,7 @@ module ESearchy
           :desc => "Parses Spoke using Google Searches that match.",
           # URL/page,data of engine or site to parse
           :engine => "www.google.com",
+          :help => "",
           :author => "Matias P. Brutti <FreedomCoder>", 
           # Port for request
           :port => 80,
@@ -38,48 +39,52 @@ module ESearchy
       
       private
       def parse( results )
+        ts = []
         results.each do |result|
-          begin
-            name_last = result[:title].scan(/[\w\s]*,/)[0]
-            if name_last != nil && name_last != " |"
-              name_last = name_last.gsub(/[profiles*|,]*/i,"").strip.split(" ")
-              name = name_last[0]
-              last = name_last[1]
-              if (name.strip != "" || last.strip != "") && (name != nil || last != nil) 
-                if result[:url].match(/http[s]*:\/\/www.spoke.com\/info\//) != nil
-                  info = spoke(result[:url])
-                  if info[:company] == @options[:company]
-                    new_empl = @project.persons.where(:name => name, :last => last)
-                    if new_empl.size == 0 
-                      employee = Person.new 
-                      employee.name = name
-                      employee.last = last
-                      employee.created_at = Time.now
-                      employee.found_by = @info[:name]
-                      employee.found_at = result[:url]
-                      employee.networks << Network.new({:name => "Spoke", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
-                      @project.persons << employee
-                      @project.save
-                      Display.msg "[Spoke] + " + name + " " + last
-                    else
-                      employee = new_empl.first
-                      if networks_exist?(employee.networks, "Spoke")
-                        Display.msg "[Spoke] < " + name + " " + last
+          ts << Thread.new {
+            begin
+              name_last = result[:title].scan(/[\w\s]*,/)[0]
+              if name_last != nil && name_last != " |"
+                name_last = name_last.gsub(/[profiles*|,]*/i,"").strip.split(" ")
+                name = name_last[0]
+                last = name_last[1]
+                if (name.strip != "" || last.strip != "") && (name != nil || last != nil) 
+                  if result[:url].match(/http[s]*:\/\/www.spoke.com\/info\//) != nil
+                    info = spoke(result[:url])
+                    if info[:company] == @options[:company]
+                      new_empl = @project.persons.where(:name => name, :last => last)
+                      if new_empl.size == 0 
+                        employee = Person.new 
+                        employee.name = name
+                        employee.last = last
+                        employee.created_at = Time.now
+                        employee.found_by = @info[:name]
+                        employee.found_at = result[:url]
                         employee.networks << Network.new({:name => "Spoke", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
-                        employee.found_by << @info[:name]
-                        employee.save!
+                        @project.persons << employee
                         @project.save
+                        Display.msg "[Spoke] + " + name + " " + last
                       else
-                        Display.msg "[Spoke] = " + name + " " + last
+                        employee = new_empl.first
+                        if networks_exist?(employee.networks, "Spoke")
+                          Display.msg "[Spoke] < " + name + " " + last
+                          employee.networks << Network.new({:name => "Spoke", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
+                          employee.found_by << @info[:name]
+                          employee.save!
+                          @project.save
+                        else
+                          Display.msg "[Spoke] = " + name + " " + last
+                        end
                       end
                     end
                   end
                 end
               end
+            rescue Exception => e
+              Display.debug "Something went wrong." + e
             end
-          rescue Exception => e
-            Display.debug "Something went wrong." + e
-          end
+          }
+          ts.each {|t| t.join }
         end
       end
     end

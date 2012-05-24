@@ -35,7 +35,7 @@ module ESearchy
             if @options[:domain] != ""
               if @options[:length_n].class == Range && @options[:length_l].class == Range          
                 @project.persons.each do |person|
-                  Display.msg "[Generating email] -> " + person.name + " " + person.last
+                  Display.msg "[Generating email] - " + person.name + " " + person.last
                   if @options[:first] == "NAME"
                     email = person.name[@options[:length_n]] + @options[:spliter] + person.last[@options[:length_l]] + "@"  + @options[:domain]
                   elsif @options[:first] == "LAST"

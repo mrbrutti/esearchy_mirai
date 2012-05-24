@@ -12,6 +12,7 @@ module ESearchy
           :name => "PageParser",
           :desc => "Parses a single page for emails addresses that match query",
           #TYPE 1 searches emails / TYPE 2 Searches people / TYPE 3 Profiling and Operations with data.
+          :help => "",
           :author => "Matias P. Brutti <FreedomCoder>",           
           :type => 1
         }

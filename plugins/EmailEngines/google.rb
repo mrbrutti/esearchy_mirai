@@ -14,6 +14,7 @@ module ESearchy
           :desc => "Parses Google Searches for emails addresses that match query",
           # URL/page,data of engine or site to parse
           :engine => "www.google.com",
+          :help => "",
           :author => "Matias P. Brutti <FreedomCoder>",           
           # Port for request
           :port => 80,
@@ -38,24 +39,28 @@ module ESearchy
       end
             
       def parse( results )
+        ts = []
         results.each do |result|
-          begin
-            Display.debug "--> Parsing <" + result[:url] + ">"
-            emails_in_text(result[:content]).concat(emails_in_url(result[:url])).each do |correo|
-              correo.downcase!
-              if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
-                if email_exist?(correo)
-                  @project.emails << Email.new({:email => correo, :url => result[:url], :found_by => @info[:name]})
-                  @project.save!
-                  Display.msg "[Google] + " + correo
-                else
-                  Display.msg "[Google] = " + correo
+          ts << Thread.new {
+            begin
+              Display.debug "--> Parsing <" + result[:url] + ">"
+              emails_in_text(result[:content]).concat(emails_in_url(result[:url])).each do |correo|
+                correo.downcase!
+                if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
+                  if email_exist?(correo)
+                    @project.emails << Email.new({:email => correo, :url => result[:url], :found_by => @info[:name]})
+                    @project.save!
+                    Display.msg "[Google] + " + correo
+                  else
+                    Display.msg "[Google] = " + correo
+                  end
                 end
               end
+            rescue Exception => e
+              Display.debug "Something went wrong parsing an email" + e
             end
-          rescue Exception => e
-            Display.debug "Something went wrong parsing an email" + e
-          end
+          }
+          ts.each {|t| t.join }
         end
       end
     end

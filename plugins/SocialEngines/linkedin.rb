@@ -14,6 +14,7 @@ module ESearchy
           :desc => "Parses LinkedIn using Google Searches that match.",
           # URL/page,data of engine or site to parse
           :engine => "www.google.com",
+          :help => "",
           :author => "Matias P. Brutti <FreedomCoder>",       
           # Port for request
           :port => 80,
@@ -39,7 +40,9 @@ module ESearchy
       end
             
       def parse( results )
+        ts = []
         results.each do |result|
+          ts << Thread.new {
           begin
             name_last = result[:title].scan(/[\w\s]* \|/)[0]
             if name_last != nil && name_last != " |"
@@ -81,6 +84,8 @@ module ESearchy
           rescue Exception => e
             Display.debug "Something went wrong." + e
           end
+        }
+        ts.each {|t| t.join }
         end
       end
     end

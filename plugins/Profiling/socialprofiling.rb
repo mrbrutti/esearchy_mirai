@@ -1,8 +1,10 @@
+require 'thread'
+
 module ESearchy  
   module Profiling
     class SocialProfiling < ESearchy::BasePlugin
       include ESearchy::Helpers::Search
-      include ESearchy::Parsers::Email
+      include ESearchy::Parsers::People
 
       ESearchy::PLUGINS[self.name.split("::")[-1].downcase] = self
       
@@ -14,6 +16,7 @@ module ESearchy
           :desc => "Parses Ziggs using Google Searches that match.",
           # URL/page,data of engine or site to parse
           :engine => "www.google.com",
+          :help => "",
           :author => "Matias P. Brutti <FreedomCoder>", 
           # Port for request
           :port => 80,
@@ -36,7 +39,9 @@ module ESearchy
               @options[:query] = CGI.escape(person.name + " " + person.last + " at " + @options[:company])
               Display.msg "[SocialProfiling] - " + person.name + " " + person.last
               search_engine do
+                ts = []
                 google.each do |result|
+                  ts << Thread.new {
                   begin
                     case result[:url]
                     when /linkedin.com/i
@@ -98,6 +103,8 @@ module ESearchy
                   rescue Exception => e
                     Display.error "Something went wrong with #{person.name + " " + person.last}" + e
                   end
+                }
+                ts.each {|t| t.join }
                 end
               end
               person[:interestinglinks] = google[0..25]
