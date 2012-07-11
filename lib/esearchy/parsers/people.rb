@@ -125,6 +125,9 @@ module ESearchy
 						person[:last] = get_info(doc.search('span[@class="family-name"]'))
 						person[:title] = get_info(doc.search('p[@class="headline-title title"]'))
 						person[:location] = get_info(doc.search('dd[@class="locality"]'))
+						person[:photo] = doc.search('div[@class="image zoomable"]').search('img[@class="photo"]')[0] == nil ? 
+							"http://s4.licdn.com/scds/common/u/img/icon/icon_no_photo_40x40.png" : 
+							doc.search('div[@class="image zoomable"]').search('img[@class="photo"]')[0].attributes["src"].value
 						person[:company] = @options[:company]
 						person[:education] = get_info(doc.search('dd[@class="summary-education"]')).gsub(/\t|\n|(\s)\1{5,}/,"")
 						return person

@@ -52,7 +52,7 @@ module ESearchy
               if (name.strip != "" || last.strip != "") && (name != nil || last != nil) 
                 if result[:url].match(/http[s]*:\/\/www.linkedin.com\/pub\//) != nil
                   info = linkedin(result[:url])
-                  if info[:company] == @options[:company]
+                  if info[:company].downcase == @options[:company].downcase
                     new_empl = @project.persons.where(:name => name, :last => last)
                     if new_empl.size == 0 
                       employee = Person.new 

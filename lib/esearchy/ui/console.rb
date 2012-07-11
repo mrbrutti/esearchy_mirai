@@ -52,7 +52,6 @@ module ESearchy
   			trap("INT") { exit_app }
       	while true do
       		parse_line prompt
-          #Readline::History::Restore.new(ENV["HOME"] + "/.esearchy/.esearchy_console_history", :history_limit => 100)
       	end
   		end
   	  

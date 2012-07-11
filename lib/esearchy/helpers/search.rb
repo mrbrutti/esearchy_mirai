@@ -6,6 +6,8 @@ module ESearchy
     module Search      
       def google
         Display.debug "Entering Google Search for query= #{@options[:query]}"
+
+
         doc = Nokogiri::HTML(open("http://www.google.com/cse?&safe=off&num=100&site=&q=" +  
                                     @options[:query]  + "&btnG=Search&start=" + @options[:start].to_s))
 
@@ -13,10 +15,12 @@ module ESearchy
         if @options[:start] == 0 
           if doc.search("font")[0].elements[2] != nil
             @options[:results] = doc.search("font")[0].elements[2].text.gsub(",","").to_i
+          elsif doc.search("font")[0] != nil
+            @options[:results] = doc.search("font")[0].text.scan(/([0-9]*) result/)[0][0].to_i 
           else
-            Display.error "No results were found."
-            @options[:results] = 0
-            return []
+            Display.error "No result amount was found."
+            @options[:results] = @options[:stop]
+            #return []
           end
         end 
         # create results array.

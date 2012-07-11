@@ -57,6 +57,7 @@ module ESearchy
 				    Display.error "Not within a plugin. Select one and then run :)"
 				  else  
 				    $running_context.run
+				    $running_context.options[:start] = 0
 			    end
 				rescue Exception => e
   				Display.error "Something went wrong loading the plugin. #{e}"

@@ -1,3 +1,53 @@
+module ESearchy  
+  module StateEngines
+    class SecOfState < ESearchy::BasePlugin
+      include ESearchy::Parsers::Email
+
+      ESearchy::PLUGINS[self.name.split("::")[-1].downcase] = self
+      
+
+      def initialize(options={}, &block)
+        @info = {
+          #This name should be the class name
+          :name => "SecOfState",
+          :desc => "Parses Secretary of State information looking for Company Information",
+          # URL/page,data of engine or site to parse
+          :engine => "www.sos.wa.gov",
+          # Port for request
+          :help => "",
+          :author => "Matias P. Brutti <FreedomCoder>", 
+          #TYPE 1 searches emails / TYPE 2 Searches people / TYPE 3 Profiling and Operations with data / TYPE 4 Company info.
+          :type => 4
+        }
+        super options
+      end
+      
+      def run
+        begin 
+          if @options[:company] != "" 
+
+            Display.msg "Please Choose one option: "
+
+          else
+            Display.error "Needo to provide a query. (i.e. @company.com)."
+          end
+        rescue Exception => e
+          Display.debug "Something went wrong parsing an email" + e
+        end
+      end
+
+      def search_name(company_name)
+      	
+      end
+
+      def search_UBI(ubi_id)
+      	
+      end
+    end
+  end
+end
+
+
 # Also add another plugin for EDGAR http://www.sec.gov/edgar/searchedgar/companysearch.html
 # This plugin should concentrate in obtaining corporate state information in US.
 # http://www.coordinatedlegal.com/SecretaryOfState.html

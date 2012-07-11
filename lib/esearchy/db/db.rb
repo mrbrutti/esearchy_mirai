@@ -19,6 +19,7 @@ module ESearchy
 		end
 		def self.connect
 			Display.msg "Connecting ESearchy to MongoDB"
+			sleep(2)
 			MongoMapper.connection = Mongo::Connection.new($globals[:dbhost] || "localhost", $globals[:dbport] || 27017)
 			MongoMapper.database = $globals[:dbname] || "esearchy"
 		rescue
