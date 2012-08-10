@@ -60,9 +60,9 @@ module ESearchy
 				    $running_context.options[:start] = 0
 			    end
 				rescue Exception => e
-  				Display.error "Something went wrong loading the plugin. #{e}"
+  					Display.error "Something went wrong loading the plugin. #{e}"
+  				end
   			end
-  		end
 			#
 			# Command: show
 			# Description: This should show globals options, instance options, plugin options.
@@ -156,6 +156,10 @@ module ESearchy
 				end 
 			end
 
+			#
+			# Command: help command
+			# Description: This meta-class only displays the command tree
+			#
 			def help_commands()
 				Display.help ""
 				Display.help "  help <plugin>"
@@ -202,7 +206,8 @@ module ESearchy
 				# [ TODO ] Display.help "  load <plugin>"
 				# [ TODO ] Display.help "  exit"
 				Display.help " "
-		end
+			end
+			
 			def cmd_list(args)
 				begin
 					if args == []
@@ -319,23 +324,24 @@ module ESearchy
 			# Description: Confirmation method to exit app
 			#
 			def exit_app
-      	Display.warn "Are you sure you want to quit EMaily? [yes/no] "
-      	if $stdin.gets.strip == "yes"
-      		#Display.warn "Do you want to stop the database? [yes/no] "
-      		#if $stdin.gets.strip == "yes"
-      			ESearchy::DB.stop
-      		#end
-      		$running_context
-      		Kernel.exit(1)
-      	end
-      end
-      #
-      # Command: NONE
-      # This should handle the non-existant methods. 
-      #
-      def self.method_missing(method_sym, *arguments, &block)
-			  Display.error "Command #{method_sym} does not exists."
-		  end
+		      	Display.warn "Are you sure you want to quit EMaily? [yes/no] "
+		      	if $stdin.gets.strip == "yes"
+		      		#Display.warn "Do you want to stop the database? [yes/no] "
+		      		#if $stdin.gets.strip == "yes"
+		      			ESearchy::DB.stop
+		      		#end
+		      		$running_context
+		      		Kernel.exit(1)
+		      	end
+      		end
+      		
+	      	#
+	      	# Command: NONE
+	      	# This should handle the non-existant methods. 
+	      	#
+	      	def self.method_missing(method_sym, *arguments, &block)
+				Display.error "Command #{method_sym} does not exists."
+			end
 		end
 	end
 end

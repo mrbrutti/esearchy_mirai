@@ -1,3 +1,17 @@
+## Copyright 2012, Matias Pablo Brutti  All rights reserved.
+##
+## Esearchy is free software: you can redistribute it and/or modify it under 
+## the terms of version 3 of the GNU Lesser General Public License as 
+## published by the Free Software Foundation.
+##
+## Esearchy is distributed in the hope that it will be useful, but WITHOUT ANY
+## WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+## FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for 
+## more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with ESearchy.  If not, see <http://www.gnu.org/licenses/>.
+
 unless Kernel.respond_to?(:require_relative)
   module Kernel
     def require_relative(path)
@@ -14,7 +28,7 @@ else
 end
 
 GEM_PATH="gem"
-VERSION="2.0.4"
+VERSION="2.0.6"
 require 'rubygems'
 #require 'readline'
 require 'getoptlong'

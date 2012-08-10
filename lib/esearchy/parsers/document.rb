@@ -30,15 +30,77 @@ end
 module ESearchy
 	module Parsers
 		module Document
-			def emails_in_doc(url)
-				#download
-				#case type
-				return emails
+			def emails_in_doc(url,filetype)
+        d = Doc.new(url,filetype)
+        d.download
+        return d.process
 			end
 
+      class Doc
+        def initialize(url,filetype)
+          @url = url
+          @filetype = filetype
+          @file = nil
+        end
+
+        def download
+          data = open(@url)
+          @file = save_to_disk(data)
+        end
+
+        def save_to_disk(url, data)
+          name = TEMP + "#{hash_url(url)}" + format
+          open(name, "wb") { |file| file.write(data) }
+          name
+        end
+
+        def process
+
+        end
+      end
 
 			# Private methods to manage documents. 
 			private
+
+      def filetype
+        case URL
+        when /.pdf/i
+          "PDF"
+        when /.doc/i
+          "DOC"
+        when /.txt|.rtf|.ans/i
+          "PLAIN"
+        when /.docx|.xlsx|.pptx|.odt|.odp|.ods|.odb/i
+          "XML"
+        else
+          Display.error "Format #{format} not supported."
+          return nil
+        end
+      end
+    
+      def download(file_url)
+        begin
+          doc = open(file_url)
+          save_to_disk(file_url,doc)
+        rescue => e
+          Display.error "Something went wrong" + e
+        end
+      end
+
+      def save_to_disk(url, data)
+        name = TEMP + "#{hash_url(url)}" + format
+        open(name, "wb") { |file| file.write(data) }
+        name
+      end
+      
+      def remove_from_disk(name)
+        `rm "#{name}"`
+      end
+      
+      def hash_url(url)
+        Digest::SHA2.hexdigest("#{Time.now.to_f}--#{url}")
+      end
+
 			# Handle PDF files. 
 			def pdf(name)
 	      begin
