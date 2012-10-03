@@ -88,8 +88,6 @@ module ESearchy
   		def prompt
       	return Readline.readline("esearchy#{project_context}#{context}:> ", true).strip
     	end
-    	
-
     end
   end
 end

@@ -34,13 +34,7 @@ module ESearchy
             emails_in_url(url).each do |correo|
               correo.downcase!
               if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
-                if email_exist?(correo)
-                  @project.emails << Email.new({:email => correo, :url => url, :found_by => @info[:name]})
-                  @project.save!
-                  Display.msg "[PGP] + " + correo
-                else
-                  Display.msg "[PGP] = " + correo
-                end
+                add_email correo, url
               end
             end
           else

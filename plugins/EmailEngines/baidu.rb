@@ -43,21 +43,16 @@ module ESearchy
             begin
               emails_in_text(result[:content]).concat(emails_in_url(result[:url])).each do |correo|
                 if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
-                  if email_exist?(@project.emails, correo)
-                    @project.emails << Email.new({:email => correo, :url => result[:url], :found_by => @info[:name]})
-                    @project.save!
-                    Display.msg "[Baidu] + " + correo
-                  else
-                    Display.msg "[Baidu] = " + correo
-                  end
+                  add_email correo, result[:url]
                 end
               end
             rescue Exception => e
               Display.debug "Something went wrong." + e
             end
           }
-          ts.each {|t| t.join }
         end
+        ts.each {|t| t.join }
+        return nil
       end
     end
   end

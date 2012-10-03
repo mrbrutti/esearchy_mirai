@@ -44,14 +44,22 @@ module ESearchy
       end
     
       def bing
-        doc = JSON.parse(open("http://api.search.live.net/json.aspx?AppId=" + $globals[:bingkey] + 
-                              "&query=" + @options[:query] + "&Sources=Web&Web.Count=50&Web.Offset=" + @options[:start].to_s).readlines[0])
+        doc = JSON.parse(open("https://api.datamarket.azure.com/Bing/Search/Web?Query=%27" + 
+                               CGI.escape(@options[:query]) + "%27&$format=json&$top=50&$skip=" + @options[:start].to_s , 
+                               :http_basic_authentication=>[$globals[:bingkey],$globals[:bingkey]]).readlines[0])
+
+        # OLD URL
+        # doc = JSON.parse(open("http://api.search.live.net/json.aspx?AppId=" + $globals[:bingkey] + 
+        #                      "&query=" + @options[:query] + "&Sources=Web&Web.Count=50&Web.Offset=" + @options[:start].to_s).readlines[0])
         # For the first search extract results. 
-        @options[:results] = doc["SearchResponse"]["Web"]["Total"].to_i if @options[:start] == 0
+        #@options[:results] = doc["SearchResponse"]["Web"]["Total"].to_i if @options[:start] == 0
         # create results array. 
+        # No longer providing a total. MSFT sucks even for this :(
+        @options[:results] = @options[:stop]
+
         results = []
         begin
-          doc["SearchResponse"]["Web"]["Results"].each do |result| 
+          doc["d"]["results"].each do |result| 
             begin
               results << { :title => result["Title"], :url => result["Url"], :content => result["Description"] }
             rescue
@@ -83,7 +91,7 @@ module ESearchy
             begin
               results << { :title => result.search('h3[@class="t"]').text, 
                            :url => result.search('h3[@class="t"]').children[0]['href'], 
-                           :content => result.search('font').text.stri }
+                           :content => result.search('font').text.strip }
             rescue
               Display.error "Something went wrong parsing a result at #{@options[:start]} with query #{@options[:query]}"
             end

@@ -43,50 +43,53 @@ module ESearchy
         ts = []
         results.each do |result|
           ts << Thread.new {
-          begin
-            name_last = result[:title].scan(/[\w\s]* \|/)[0]
-            if name_last != nil && name_last != " |"
-              name_last = name_last.gsub(/profile[s]*/i,"").gsub("|","").strip.split(" ")
-              name = name_last.first
-              last = name_last.last
-              if (name.strip != "" || last.strip != "") && (name != nil || last != nil) 
-                if result[:url].match(/http[s]*:\/\/www.linkedin.com\/pub\//) != nil
-                  info = linkedin(result[:url])
-                  if info[:company].downcase == @options[:company].downcase
-                    new_empl = @project.persons.where(:name => name, :last => last)
-                    if new_empl.size == 0 
-                      employee = Person.new 
-                      employee.name = name
-                      employee.last = last
-                      employee.created_at = Time.now
-                      employee.found_by = @info[:name]
-                      employee.found_at = result[:url]
-                      employee.networks << Network.new({:name => "LinkedIn", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
-                      @project.persons << employee
-                      @project.save
-                      Display.msg "[LinkedIn] + " + name + " " + last
-                    else
-                      employee = new_empl.first
-                      if networks_exist?(employee.networks, "LinkedIn")
-                        Display.msg "[LinkedIn] < " + name + " " + last
-                        employee.networks << Network.new({:name => "LinkedIn", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
-                        employee.found_by << @info[:name]
-                        employee.save!
-                        @project.save
-                      else
-                        Display.msg "[LinkedIn] = " + name + " " + last
+            begin
+              name_last = result[:title].scan(/[\w\s]* \|/)[0]
+              if name_last != nil && name_last != " |"
+                name_last = name_last.gsub(/profile[s]*/i,"").gsub("|","").strip.split(" ")
+                name = name_last.first
+                last = name_last.last
+                if (name.strip != "" || last.strip != "") && (name != nil || last != nil) 
+                  if result[:url].match(/http[s]*:\/\/www.linkedin.com\/pub\//) != nil
+                    info = linkedin(result[:url])
+                    if info[:company] != nil
+                      if info[:company].downcase == @options[:company].downcase
+                        new_empl = @project.persons.where(:name => name, :last => last)
+                        if new_empl.size == 0 
+                          employee = Person.new 
+                          employee.name = name
+                          employee.last = last
+                          employee.created_at = Time.now
+                          employee.found_by = @info[:name]
+                          employee.found_at = result[:url]
+                          employee.networks << Network.new({:name => "LinkedIn", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
+                          @project.persons << employee
+                          @project.save
+                          Display.msg "[LinkedIn] + " + name + " " + last
+                        else
+                          employee = new_empl.first
+                          if networks_exist?(employee.networks, "LinkedIn")
+                            Display.msg "[LinkedIn] < " + name + " " + last
+                            employee.networks << Network.new({:name => "LinkedIn", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
+                            employee.found_by << @info[:name]
+                            employee.save!
+                            @project.save
+                          else
+                            Display.msg "[LinkedIn] = " + name + " " + last
+                          end
+                        end
                       end
                     end
                   end
                 end
               end
+            rescue Exception => e
+              Display.debug "Something went wrong." + e
             end
-          rescue Exception => e
-            Display.debug "Something went wrong." + e
-          end
-        }
-        ts.each {|t| t.join }
+          }
         end
+        ts.each {|t| t.join }
+        return nil
       end
     end
   end

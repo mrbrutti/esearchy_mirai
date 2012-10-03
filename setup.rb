@@ -28,7 +28,7 @@ else
 end
 
 GEM_PATH="gem"
-VERSION="2.0.6"
+MONGO_VERSION="2.0.6"
 require 'rubygems'
 #require 'readline'
 require 'getoptlong'
@@ -61,15 +61,28 @@ opts.each do |opt, arg|
   end
 end
 
+def gem_cmd
+  if  RUBY_PLATFORM =~ /darwin|osx/
+    return "sudo #{GEM_PATH}"
+  else
+    return "#{GEM_PATH}"
+  end
+end
+
 # CHECK FOR GEMS HACK METHOD
 def gem_available?(name)
   Gem::Specification.find_by_name(name)
+rescue NoMethodError
+  puts "[*] - esearchy requires #{name}."
+  system "#{gem_cmd} update --system"
+  puts "[*] - Please restart the script."
+  exit(1)
 rescue Gem::LoadError
   puts "[*] - esearchy requires #{name}."
-  system "gem install #{name}"
+  system "#{gem_cmd} install #{name}"
 end
 
-puts "-<[ ESearchy 0.3 CodeName Miata ]>-"
+puts "-<[ ESearchy 0.3 CodeName Mirai ]>-"
 puts "-<[ Setup and Configurations script ]>-"
 puts ""
 puts "[*] - Missing Gem installation"
@@ -86,12 +99,12 @@ require_relative 'lib/esearchy/helpers/display.rb'
 # MONGO METHODS
 def mongo_download(os,platform)
   case os
-  when /linux|osx/
-    Display.msg "Downloading mongodb-#{os}-#{platform}-#{VERSION}.tgz"
-    system("curl http://fastdl.mongodb.org/#{os}/mongodb-#{os}-#{platform}-#{VERSION}.tgz > external/mongodb.tgz")
+  when /linux|osx|darwin/
+    Display.msg "Downloading mongodb-#{os}-#{platform}-#{MONGO_VERSION}.tgz"
+    system("curl http://fastdl.mongodb.org/#{os}/mongodb-#{os}-#{platform}-#{MONGO_VERSION}.tgz > external/mongodb.tgz")
   when /win32/
-    Display.msg "Downloading mongodb-#{os}-#{platform}-#{VERSION}.zip" 
-    system("external/tools/wget.exe -O external\\mongodb.zip http://fastdl.mongodb.org/#{os}/mongodb-#{os}-#{platform}-#{VERSION}.zip")
+    Display.msg "Downloading mongodb-#{os}-#{platform}-#{MONGO_VERSION}.zip" 
+    system("external/tools/wget.exe -O external\\mongodb.zip http://fastdl.mongodb.org/#{os}/mongodb-#{os}-#{platform}-#{MONGO_VERSION}.zip")
   end
 end
 
@@ -163,19 +176,20 @@ def configure_esearchy
   unless File.exists?((ENV["HOME"] + "/.esearchy/config").gsub("/",@slash))
     File.open((ENV['HOME'] + "/.esearchy/config").gsub("/",@slash), "w" ) do |line|
       # A few defaults. Although this can all be overwritten at runtime. 
-      line << " { \"maxhits\" : 1000,\n"
-      line << " \"yahookey\" : \"AwgiZ8rV34Ejo9hDAsmE925sNwU0iwXoFxBSEky8wu1viJqXjwyPP7No9DYdCaUW28y0.i8pyTh4\",\n" 
-      line << "\"bingkey\" : \"220E2E31383CA320FF7E022ABBB8B9959F3C0CFE\",\n"
-      line << "\"dburl\" : \"localhost\",\n"
-      line << "\"dbport\" : 27017,\n"
-      line << " \"dbname\" : \"esearchy\"\n,"
+      line << "{"
+      line << "\t\"maxhits\" : 1000,\n"
+      line << "\t\"yahookey\" : \"AwgiZ8rV34Ejo9hDAsmE925sNwU0iwXoFxBSEky8wu1viJqXjwyPP7No9DYdCaUW28y0.i8pyTh4\",\n" 
+      line << "\t\"bingkey\" : \"2KVYFdqxGbncMWuC2+Hd6KHnR181NvEaA6XqDc+npBI=\",\n"
+      line << "\t\"dburl\" : \"localhost\",\n"
+      line << "\t\"dbport\" : 27017,\n"
+      line << "\t\"dbname\" : \"esearchy\"\n,"
       case RUBY_PLATFORM
       when /linux|darwin/
-        line << " \"editor\" : \"vim\"\n"
-        line << " \"antiword\" :\"/usr/bin/antiword\"\n"
+        line << "\t\"editor\" : \"vim\",\n"
+        line << "\t\"antiword\" :\"/usr/bin/antiword\"\n"
       when /mingw|mswin/
-        line << " \"editor\" : \"notepad.exe\"\n"
-        line << " \"antiword\" : \"C:\\antiword\\antiword.exe\"\n"
+        line << "\t\"editor\" : \"notepad.exe\",\n"
+        line << "\t\"antiword\" : \"C:\\antiword\\antiword.exe\"\n"
       end
       line << "}"
   end

@@ -75,5 +75,15 @@ module ESearchy
         false
       end
     end
+
+    def add_email(email, url)
+      if email_exist?(email)
+        @project.emails << Email.new({:email => email, :url => url, :found_by => @info[:name]})
+        @project.save!
+        Display.msg "[#{@info[:name]}] + " + email
+      else
+        Display.msg "[#{@info[:name]}] = " + email
+      end
+    end
   end
 end

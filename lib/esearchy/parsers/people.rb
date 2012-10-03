@@ -13,6 +13,7 @@ module ESearchy
 						person[:last] = name_last.last
 						person[:title] = get_info(doc.search('span[@id="ctl00_ContentPlaceHolder1_MemberImageCard1_lblTitle"]'))
 						person[:company] = @options[:company]
+						person[:photo] = get_info(doc.search('img[@id="ctl00_ContentPlaceHolder1_MemberImageCard1_imgMember"]'))
 						person[:city], person[:state] = get_info(doc.search('span[@id="ctl00_ContentPlaceHolder1_MemberImageCard1_lblLocation"]')).split(",")
 						#Fetch resume URL if a resume doc is posted.
 						resume = doc.search('a[@id="ctl00_ContentPlaceHolder1_lnkResumeName"]')		  
@@ -47,8 +48,8 @@ module ESearchy
 						person[:title] = get_info(doc.search('div[@class="aYm0te c-wa-Da title"]'))
 						person[:company] = @options[:company]
 						person[:city] = get_info(doc.search('div[@class="adr"]'))
-		  			person[:gender] = get_info(doc.search('div[@class="kM5Oeb-fYiPJe KtnyId IzbGp"]')).gsub("Gender","") 
-
+		  				person[:gender] = get_info(doc.search('div[@class="kM5Oeb-fYiPJe KtnyId IzbGp"]')).gsub("Gender","") 
+		  				person[:photo] = get_info(doc.search('img[@class="l-tk photo"]'))
 						work_edit = doc.search('ul[@class="FLMe8d"]')
 						# Work History
 						if work_edit[0] != nil
@@ -73,10 +74,6 @@ module ESearchy
 				end	
 			end
 
-			def facebook
-				
-			end
-
 			def twitter(profile)
 				begin
 					person = {}
@@ -84,6 +81,7 @@ module ESearchy
 					person = JSON.parse(open("https://api.twitter.com/1/users/show.json?screen_name=#{screenname}&include_entities=true").readlines[0], :symbolize_names => true)
 					person[:friends] = JSON.parse(open("https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=#{screenname}").readlines[0])["ids"]
 					person[:followers] = JSON.parse(open("https://api.twitter.com/1/followers/ids.json?cursor=-1&screen_name=#{screenname}").readlines[0])["ids"]
+					person[:photo] = person[:profile_image_url]
 					return person
 				rescue
 					return person
@@ -103,6 +101,7 @@ module ESearchy
 						person[:city], person[:state] = information.split("High School")[1].split("Class")[0].strip.split(", ")
 						person[:company] = @options[:company]
 						person[:communities] = get_info(doc.search('ul[@class="botMargin1"]')).split(")").map {|x| x.strip + ")"}
+						person[:photo] = get_info(doc.search('div[@class"space1marT"'))
 						return person
 					else
 						return {}
@@ -110,10 +109,6 @@ module ESearchy
 				rescue
 					return {}
 				end		
-			end
-
-			def googleprofiles
-				
 			end
 			
 			def linkedin(profile)
@@ -126,7 +121,7 @@ module ESearchy
 						person[:title] = get_info(doc.search('p[@class="headline-title title"]'))
 						person[:location] = get_info(doc.search('dd[@class="locality"]'))
 						person[:photo] = doc.search('div[@class="image zoomable"]').search('img[@class="photo"]')[0] == nil ? 
-							"http://s4.licdn.com/scds/common/u/img/icon/icon_no_photo_40x40.png" : 
+							"˚∫" : 
 							doc.search('div[@class="image zoomable"]').search('img[@class="photo"]')[0].attributes["src"].value
 						person[:company] = @options[:company]
 						person[:education] = get_info(doc.search('dd[@class="summary-education"]')).gsub(/\t|\n|(\s)\1{5,}/,"")
@@ -139,12 +134,20 @@ module ESearchy
 				end				
 			end
 
+			def facebook
+				
+			end
+
 			def jigsaw
 				
 			end
 
 			def plaxo
 				
+			end
+
+			def googleprofiles(profile)
+				googleplus(profile)
 			end
 
 			def spoke(profile)
@@ -156,6 +159,7 @@ module ESearchy
 						person[:title] = get_info(doc.search('span[@class="title"]'))
 						person[:company] = @options[:company]
 						person[:detail] = get_info(doc.search('div[@class="expandable bio"]'))
+						person[:photo] = "http://www.spoke.com" + get_info(doc.search('div[@class="img-profile"]'))
 						return person
 					else
 						return {}
@@ -166,7 +170,6 @@ module ESearchy
 			end
 
 			private
-
 			def get_info(res)
 				res[0] == nil ? "" : res[0].text.strip
 			end

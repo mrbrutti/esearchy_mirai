@@ -54,31 +54,33 @@ module ESearchy
                 if (name.strip != "" || last.strip != "") && (name != nil || last != nil) 
                   if result[:url].match(/http[s]*:\/\/www.classmates.com\/[directory|people]*\//) != nil
                     info = classmates(result[:url])
-                    if info[:company] == @options[:company]
-                      new_empl = @project.persons.where(:name => name, :last => last)
-                      if new_empl.size == 0 
-                        employee = Person.new 
-                        employee.name = name
-                        employee.last = last
-                        employee.created_at = Time.now
-                        employee.found_by = @info[:name]
-                        employee.found_at = result[:url]
-                        employee.networks << Network.new({:name => "Classmates", :url => result[:url], 
-                                                          :nickname => result[:url].split("regId=")[1], :info => info, :found_by => @info[:name]})
-                        @project.persons << employee
-                        @project.save
-                        Display.msg "[Classmates] + " + name + " " + last
-                      else
-                        employee = new_empl.first
-                        if networks_exist?(employee.networks, "Classmates")
-                          Display.msg "[Classmates] < " + name + " " + last
+                    if info[:company] != nil
+                      if info[:company].downcase == @options[:company].downcase
+                        new_empl = @project.persons.where(:name => name, :last => last)
+                        if new_empl.size == 0 
+                          employee = Person.new 
+                          employee.name = name
+                          employee.last = last
+                          employee.created_at = Time.now
+                          employee.found_by = @info[:name]
+                          employee.found_at = result[:url]
                           employee.networks << Network.new({:name => "Classmates", :url => result[:url], 
                                                             :nickname => result[:url].split("regId=")[1], :info => info, :found_by => @info[:name]})
-                          employee.found_by << @info[:name]
-                          employee.save!
+                          @project.persons << employee
                           @project.save
+                          Display.msg "[Classmates] + " + name + " " + last
                         else
-                          Display.msg "[Classmates] = " + name + " " + last
+                          employee = new_empl.first
+                          if networks_exist?(employee.networks, "Classmates")
+                            Display.msg "[Classmates] < " + name + " " + last
+                            employee.networks << Network.new({:name => "Classmates", :url => result[:url], 
+                                                              :nickname => result[:url].split("regId=")[1], :info => info, :found_by => @info[:name]})
+                            employee.found_by << @info[:name]
+                            employee.save!
+                            @project.save
+                          else
+                            Display.msg "[Classmates] = " + name + " " + last
+                          end
                         end
                       end
                     end
@@ -88,9 +90,10 @@ module ESearchy
             rescue Exception => e
               Display.debug "Something went wrong." + e
             end
-          }
-          ts.each {|t| t.join }
+          }  
         end
+        ts.each {|t| t.join }
+        return nil
       end
     end
   end

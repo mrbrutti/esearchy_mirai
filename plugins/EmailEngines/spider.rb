@@ -43,13 +43,7 @@ module ESearchy
           emails_in_text(text).each do |correo|
             correo.downcase!
             if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
-              if email_exist?(correo)
-                @project.emails << Email.new({:email => correo, :url => url, :found_by => @info[:name]})
-                @project.save!
-                Display.msg "[Spider] + " + correo
-              else
-                Display.msg "[Spider] = " + correo
-              end
+              add_email correo, url
             end
           end
         rescue Exception => e

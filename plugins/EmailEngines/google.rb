@@ -33,8 +33,10 @@ module ESearchy
           search_engine do
             parse google
           end
+          return true
         else
           Display.error "Needo to provide a query. (i.e. @company.com)."
+          return false
         end
       end
             
@@ -47,13 +49,7 @@ module ESearchy
               emails_in_text(result[:content]).concat(emails_in_url(result[:url])).each do |correo|
                 correo.downcase!
                 if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
-                  if email_exist?(correo)
-                    @project.emails << Email.new({:email => correo, :url => result[:url], :found_by => @info[:name]})
-                    @project.save!
-                    Display.msg "[Google] + " + correo
-                  else
-                    Display.msg "[Google] = " + correo
-                  end
+                  add_email correo, result[:url]
                 end
               end
             rescue Exception => e
@@ -61,6 +57,7 @@ module ESearchy
             end
           }
           ts.each {|t| t.join }
+          return nil
         end
       end
     end

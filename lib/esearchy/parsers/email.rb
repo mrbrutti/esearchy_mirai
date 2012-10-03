@@ -6,13 +6,13 @@ module ESearchy
         #parse HTML context to obtain email addresses.
         Display.debug "emails_in_url"
         #p url
-        parse_emails(source)
+        return parse_emails(source)
       end
 
       def emails_in_text(text)
         Display.debug "emails_in_text"
         #p text
-        parse_emails(text)
+        return parse_emails(text)
       end
 
       private
