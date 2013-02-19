@@ -46,8 +46,11 @@ module ESearchy
 					else 
 						project = Project.where({:name => args[0].downcase}).first
 						if project != nil
-							@options[:name] = args[0].downcase
-							@project = project
+							@options[:name] 	= args[0].downcase
+							@project 			= project
+							@options[:domain] 	= project.domain
+							@options[:url] 		= project.url
+							@options[:company] 	= project.company
 						else
 							Display.error "Project does not exists"
 						end
@@ -66,7 +69,7 @@ module ESearchy
 					@project.name 		= @options[:name]
 					@project.domain 	= @options[:domain]
 					@project.url 		= @options[:url]
-					@project.company = @options[:company]
+					@project.company 	= @options[:company]
 					@project.save
 				rescue Exception => e
 					Display.error "Something went wrong running the command." + e

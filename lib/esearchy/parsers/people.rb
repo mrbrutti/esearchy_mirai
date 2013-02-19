@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 module ESearchy
 	module Parsers
 		module People
@@ -121,7 +123,7 @@ module ESearchy
 						person[:title] = get_info(doc.search('p[@class="headline-title title"]'))
 						person[:location] = get_info(doc.search('dd[@class="locality"]'))
 						person[:photo] = doc.search('div[@class="image zoomable"]').search('img[@class="photo"]')[0] == nil ? 
-							"˚∫" : 
+							nil : 
 							doc.search('div[@class="image zoomable"]').search('img[@class="photo"]')[0].attributes["src"].value
 						person[:company] = @options[:company]
 						person[:education] = get_info(doc.search('dd[@class="summary-education"]')).gsub(/\t|\n|(\s)\1{5,}/,"")
@@ -152,19 +154,24 @@ module ESearchy
 
 			def spoke(profile)
 				doc = Nokogiri::HTML(open(profile))
+				Display.debug profile
 				begin
-					if get_info(doc.search('h3[@class="fn"]')).match(/#{@options[:company]}/i) != nil
+					company = get_info(doc.search('h3[@class="fn"]'))
+					if company.match(/#{@options[:company]}/i) != nil
+						Display.debug "I am where I should since ( " + company + " ) == " + @options[:company] + "!"
 						person = {}
-						person[:name], person[:last] = get_info(doc.search('h1[@class="ellipsis"]')).split(" ")
+						person[:name], person[:last] = get_info(doc.search('h1[@itemprop="name"]')).split(" ")
 						person[:title] = get_info(doc.search('span[@class="title"]'))
 						person[:company] = @options[:company]
-						person[:detail] = get_info(doc.search('div[@class="expandable bio"]'))
-						person[:photo] = "http://www.spoke.com" + get_info(doc.search('div[@class="img-profile"]'))
+						person[:detail] = get_info(doc.search('div[@class="expandable summary"]'))
+						person[:photo] = "http:" + doc.search('[@class="large-portrait"]')[0].children[1].attributes["src"].value
 						return person
 					else
+						Display.debug "I fail for some reason ( " + company + " ) != " + @options[:company] + "?"
 						return {}
 					end
-				rescue
+				rescue Exception => e
+					Display.debug "Error in Spoke " + e
 					return {}
 				end
 			end

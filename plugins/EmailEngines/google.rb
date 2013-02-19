@@ -41,9 +41,9 @@ module ESearchy
       end
             
       def parse( results )
-        ts = []
+        #ts = []
         results.each do |result|
-          ts << Thread.new {
+          #ts << Thread.new {
             begin
               Display.debug "--> Parsing <" + result[:url] + ">"
               emails_in_text(result[:content]).concat(emails_in_url(result[:url])).each do |correo|
@@ -55,8 +55,8 @@ module ESearchy
             rescue Exception => e
               Display.debug "Something went wrong parsing an email" + e
             end
-          }
-          ts.each {|t| t.join }
+          #}
+          #ts.each {|t| t.join }
           return nil
         end
       end

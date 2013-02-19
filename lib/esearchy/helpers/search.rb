@@ -13,10 +13,9 @@ module ESearchy
 
         # For the first search extract results.
         if @options[:start] == 0 
-          if doc.search("font")[0].elements[2] != nil
-            @options[:results] = doc.search("font")[0].elements[2].text.gsub(",","").to_i
-          elsif doc.search("font")[0] != nil
-            @options[:results] = doc.search("font")[0].text.scan(/([0-9]*) result/)[0][0].to_i 
+          result_qnty = doc.search('div[@id="resultStats"]')
+          if result_qnty != nil
+            @options[:results] = result_qnty.text.scan(/([0-9,]*) result/).to_s.gsub(",","").to_i
           else
             Display.error "No result amount was found."
             @options[:results] = @options[:stop]
@@ -27,11 +26,18 @@ module ESearchy
         Display.debug "Correcty Parsed results size (#{@options[:results]})"
         results = []
         begin
-          doc.search('div[@id="res"]')[0].search('div[@class="g"]').each do |result| 
+          doc.search('div[@id="ires"]')[0].search('li[@class="g"]').each do |result| 
             begin
-              results << { :title => result.search('a[@class="l"]')[0].text, 
-                           :url => result.search('a[@class="l"]')[0]['href'], 
-                           :content => result.search('span[@class="s"]')[0].text }
+              url = result.search('h3[@class="r"]')[0].search('a')[0]['href']
+              if url.match(/\/url\?q=/) != nil
+                res_url = url.scan(/\/url\?q=([0-9A-Za-z:\\\/?=@+%.;"'()_-]+)\&/).to_s
+              else
+                res_url = url
+              end
+
+              results << { :title => result.search('h3[@class="r"]')[0].search('a')[0].text, 
+                           :url => res_url, 
+                           :content => result.search('span[@class="st"]')[0].text }
               Display.debug "parsed result number " + results.size.to_s
             rescue
               Display.error "Something went wrong parsing a result at #{@options[:start]} with query #{@options[:query]}"
@@ -111,6 +117,7 @@ module ESearchy
           end
         rescue Exception => e
           Display.msg "Something went wrong with Search. " + e
+          Display.debug "BACKTRACE\n" + e.backtrace.map {|x| x.to_s + "\n" }.to_s + "BACKTRACE"
         end
       end
 

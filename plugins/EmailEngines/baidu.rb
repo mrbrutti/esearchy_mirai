@@ -37,9 +37,9 @@ module ESearchy
       end
             
       def parse( results )
-        ts = []
+        #ts = []
         results.each do |result|
-          ts << Thread.new {
+          #ts << Thread.new {
             begin
               emails_in_text(result[:content]).concat(emails_in_url(result[:url])).each do |correo|
                 if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
@@ -49,9 +49,9 @@ module ESearchy
             rescue Exception => e
               Display.debug "Something went wrong." + e
             end
-          }
+          #}
         end
-        ts.each {|t| t.join }
+        #ts.each {|t| t.join }
         return nil
       end
     end

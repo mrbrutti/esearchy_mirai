@@ -41,7 +41,7 @@ module ESearchy
       def parse( results )
         ts = []
         results.each do |result|
-          ts << Thread.new {
+          #ts << Thread.new {
             begin
               name_last = result[:title].scan(/[\w\s]*,/)[0]
               if name_last != nil && name_last != " |"
@@ -52,29 +52,31 @@ module ESearchy
                   if result[:url].match(/http[s]*:\/\/www.spoke.com\/info\//) != nil
                     info = spoke(result[:url])
                     if info[:company] != nil
+                      Display.debug "Checking company" + info[:company].downcase + "<=>" + @options[:company].downcase
                       if info[:company].downcase == @options[:company].downcase
-                        new_empl = @project.persons.where(:name => name, :last => last)
+                        Display.debug "Adding" + info[:name] + " " + info[:last]
+                        new_empl = @project.persons.where(:name => info[:name], :last => info[:last])
                         if new_empl.size == 0 
                           employee = Person.new 
-                          employee.name = name
-                          employee.last = last
+                          employee.name = info[:name]
+                          employee.last = info[:last]
                           employee.created_at = Time.now
                           employee.found_by = @info[:name]
                           employee.found_at = result[:url]
-                          employee.networks << Network.new({:name => "Spoke", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
+                          employee.networks << Network.new({:name => "Spoke", :url => result[:url], :nickname => info[:name]+info[:last], :info => info, :found_by => @info[:name]})
                           @project.persons << employee
                           @project.save
-                          Display.msg "[Spoke] + " + name + " " + last
+                          Display.msg "[Spoke] + " + info[:name] + " " + info[:last]
                         else
                           employee = new_empl.first
                           if networks_exist?(employee.networks, "Spoke")
-                            Display.msg "[Spoke] < " + name + " " + last
-                            employee.networks << Network.new({:name => "Spoke", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
+                            Display.msg "[Spoke] < " + info[:name] + " " + info[:last]
+                            employee.networks << Network.new({:name => "Spoke", :url => result[:url], :nickname => info[:name]+info[:last], :info => info, :found_by => @info[:name]})
                             employee.found_by << @info[:name]
                             employee.save!
                             @project.save
                           else
-                            Display.msg "[Spoke] = " + name + " " + last
+                            Display.msg "[Spoke] = " + info[:name] + " " + info[:last]
                           end
                         end
                       end
@@ -85,9 +87,9 @@ module ESearchy
             rescue Exception => e
               Display.debug "Something went wrong." + e
             end
-          }
+          #}
         end
-        ts.each {|t| t.join }
+        #ts.each {|t| t.join }
         return nil
       end
     end

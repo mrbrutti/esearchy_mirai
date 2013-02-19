@@ -13,7 +13,7 @@ module ESearchy
         @info = {
           #This name should be the class name
           :name => "SocialProfiling",
-          :desc => "Parses Ziggs using Google Searches that match.",
+          :desc => "Parses results and uses Google Searches to match and add other possible profiles",
           # URL/page,data of engine or site to parse
           :engine => "www.google.com",
           :help => "",
@@ -39,15 +39,17 @@ module ESearchy
               @options[:query] = CGI.escape(person.name + " " + person.last + " at " + @options[:company])
               Display.msg "[SocialProfiling] - " + person.name + " " + person.last
               search_engine do
-                ts = []
                 google.each do |result|
-                  ts << Thread.new {
                   begin
                     case result[:url]
                     when /linkedin.com/i
                       if networks_exist?(person.networks, "LinkedIn")
-                        person.networks << Network.new({:name => "LinkedIn", :url => result[:url],  :nickname => person.name+person.last, :info => linkedin(result[:url]), :found_by => @info[:name]}) 
-                        Display.msg "-\t< LinkedIn"
+                        info = linkedin(result[:url])
+                        if info[:company] == @options[:company]
+                          person.networks << Network.new({:name => "LinkedIn", :url => result[:url],  :nickname => person.name+person.last, :info => info, :found_by => @info[:name]}) 
+                          Display.msg "-\t< LinkedIn"
+                          person.save
+                        end
                       end
                     when /spoke.com/i
                       if networks_exist?(person.networks, "Spoke")
@@ -55,6 +57,7 @@ module ESearchy
                         if info[:company] == @options[:company]
                           person.networks << Network.new({:name => "Spoke", :url => result[:url],  :nickname => person.name+person.last, :info => info, :found_by => @info[:name]})
                           Display.msg "-\t< Spoke"
+                          person.save
                         end
                       end
                     when /http[s]*:\/\/www.classmates.com\/[directory|people]*\//i
@@ -63,39 +66,46 @@ module ESearchy
                         if info[:company] == @options[:company]
                           person.networks << Network.new({:name => "Classmates", :url => result[:url], :nickname => result[:url].split("regId=")[1], :info => info, :found_by => @info[:name]})
                           Display.msg "-\t< Classmates"
+                          person.save
                         end
                       end
                     when /twitter.com/i
                       if networks_exist?(person.networks, "Twitter")
                         person.networks << Network.new({:name => "Twitter", :url => result[:url], :nickname => result[:url].split("/").last, :info => twitter(result[:url]), :found_by => @info[:name]})
                         Display.msg "-\t< Twitter"
+                        person.save
                       end
                     when /plaxo.com/i
                       if networks_exist?(person.networks, "Plaxo")
                         person.networks << Network.new({:name => "Plaxo", :url => result[:url],  :nickname => result[:url].split("/").last, :info => {}, :found_by => @info[:name]})
                         Display.msg "-\t< Plaxo"
+                        person.save
                       end
                     when /plus.google.com|profiles.google.com/i
                       if networks_exist?(person.networks, "GooglePlus")
                         person.networks << Network.new({:name => "GooglePlus", :url => result[:url],  :nickname => result[:url].split("/").last, :info => googleplus(result[:url]), :found_by => @info[:name]})
                         Display.msg "-\t< GooglePlus"
+                        person.save
                       end
                     when /facebook.com/i
                       if networks_exist?(person.networks, "Facebook")
                         person.networks << Network.new({:name => "Facebook", :url => result[:url], :nickname => result[:url].split("/").last, :info => {}, :found_by => @info[:name]})
                         Display.msg "-\t< Facebook"
+                        person.save
                       end
                     when /ziggs.com/i
                       if networks_exist?(person.networks, "Ziggs")
                         if info[:company] == @options[:company]
                           person.networks << Network.new({:name => "Ziggs", :url => result[:url], :nickname => result[:url].split("/").last, :info => ziggs(result[:url]), :found_by => @info[:name]})
                           Display.msg "-\t< Ziggs"
+                          person.save
                         end
                       end
                     when /xing.com/i
                       if networks_exist?(person.networks, "Xing")
                         person.networks << Network.new({:name => "Xing", :url => result[:url], :nickname => result[:url].split("/").last, :info => {}, :found_by => @info[:name]})
                         Display.msg "-\t< Xing"
+                        person.save
                       end
                     else
                       Display.debug "Currently not parting #{result[:url]}"
@@ -103,14 +113,10 @@ module ESearchy
                   rescue Exception => e
                     Display.error "Something went wrong with #{person.name + " " + person.last}" + e
                   end
-                }
-                ts.each {|t| t.join }
                 end
               end
               person[:interestinglinks] = google[0..25]
-              person.save!
-              person.save
-              @project.save
+              person.save(:validate => true)
             end
           else
             Display.error "Needo to provide a company name"
