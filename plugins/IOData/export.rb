@@ -38,7 +38,7 @@ module ESearchy
             Display.error "Needo to provide a project. (i.e. > project open xyz)."
           end
         rescue Exception => e
-          Display.debug "Something went wrong parsing an email" + e
+          handle_error :error => e
         end
       end
     end

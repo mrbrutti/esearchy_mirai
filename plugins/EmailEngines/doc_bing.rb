@@ -31,7 +31,7 @@
      
        def run
         if @options[:filetype] != ""
-          if @options[:query] != ""
+          if @options[:query] != ""  and @options[:query] != nil
             query_temp = @options[:query]
             @options[:query] << "%20filetype:" + @options[:filetype]
             Display.msg "[ '+' => New, '=' => Existing ]"

@@ -36,27 +36,23 @@ module ESearchy
               @options[:query] = CGI.escape(person.name + " " + person.last + " at " + @options[:company])
               Display.msg "[EmailProfiling] - " + person.name + " " + person.last
               search_engine do
-                ts = []
                 google.each do |result|
-                  ts << Thread.new {
-                    begin
-                     emails_in_text(result[:content]).each do |correo|
-                        correo.downcase!
-                        if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
-                          if email_exist?(correo)
-                            person.emails << Email.new({:email => correo, :url => result[:url], :found_by => @info[:name]})
-                            @project.save!
-                            Display.msg "[EmailProfiling] + " + correo
-                          else
-                            Display.msg "[EmailProfiling] = " + correo
-                          end
+                  begin
+                   emails_in_text(result[:content]).each do |correo|
+                      correo.downcase!
+                      if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
+                        if email_exist?(correo)
+                          person.emails << Email.new({:email => correo, :url => result[:url], :found_by => @info[:name]})
+                          @project.save!
+                          Display.msg "[EmailProfiling] + " + correo
+                        else
+                          Display.msg "[EmailProfiling] = " + correo
                         end
                       end
-                    rescue Exception => e
-                      Display.error "Something went wrong with #{person.name + " " + person.last}" + e
                     end
-                  }
-                  ts.each {|t| t.join }
+                  rescue Exception => e
+                    handle_error :error => e
+                  end
                 end
               end
               person.save!

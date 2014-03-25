@@ -1,5 +1,3 @@
-require 'thread'
-
 module ESearchy  
   module Profiling
     class SocialProfiling < ESearchy::BasePlugin
@@ -28,98 +26,80 @@ module ESearchy
         }
         super options
       end
-      
+
+      def add_network(network_name, person, nick, url, &block)
+        if networks_exist?(person.networks, network_name)
+          block.nil? ? info = {} : info = block.call
+          if info[:company] == @options[:company]
+            person.networks << Network.new({:name => network_name, 
+                                            :url => result[:url],  
+                                            :nickname => nick, 
+                                            :info => info, 
+                                            :found_by => @info[:name]}) 
+            Display.msg "[SocialProfiling] - ++ #{network_name}"
+            person.save
+          end
+        else
+          Display.debug "[SocialProfiling] - == #{network_name}"
+        end
+      end
+
       def run
         @options[:stop] = 100
         if @project.persons != nil
           if @options[:company] != ""
             @project.persons.each do |person|
-              #p person.networks
               @options[:start] = 0
               @options[:query] = CGI.escape(person.name + " " + person.last + " at " + @options[:company])
               Display.msg "[SocialProfiling] - " + person.name + " " + person.last
               search_engine do
-                google.each do |result|
+                engine.each do |result|
                   begin
+                    # Uncomment if you want to use Baidu search engine. 
+                    #if @options[:engine] == "baidu"
+                    #  result[:url] = Net::HTTP.new("www.baidu.com", 80).request_head("/link?" + result[:url].split("/link?") )['location']
+                    #end
                     case result[:url]
                     when /linkedin.com/i
-                      if networks_exist?(person.networks, "LinkedIn")
-                        info = linkedin(result[:url])
-                        if info[:company] == @options[:company]
-                          person.networks << Network.new({:name => "LinkedIn", :url => result[:url],  :nickname => person.name+person.last, :info => info, :found_by => @info[:name]}) 
-                          Display.msg "-\t< LinkedIn"
-                          person.save
-                        end
-                      end
+                      add_network("LinkedIn", person, person.name + "_" + person.last, result[:url] ) { linkedin(result[:url]) }
                     when /spoke.com/i
-                      if networks_exist?(person.networks, "Spoke")
-                        info = spoke(result[:url])
-                        if info[:company] == @options[:company]
-                          person.networks << Network.new({:name => "Spoke", :url => result[:url],  :nickname => person.name+person.last, :info => info, :found_by => @info[:name]})
-                          Display.msg "-\t< Spoke"
-                          person.save
-                        end
-                      end
+                      add_network("Spoke", person, person.name + "_" + person.last, result[:url] ) { spoke(result[:url]) }
                     when /http[s]*:\/\/www.classmates.com\/[directory|people]*\//i
-                      if networks_exist?(person.networks, "Classmates")
-                        info = classmates(result[:url])
-                        if info[:company] == @options[:company]
-                          person.networks << Network.new({:name => "Classmates", :url => result[:url], :nickname => result[:url].split("regId=")[1], :info => info, :found_by => @info[:name]})
-                          Display.msg "-\t< Classmates"
-                          person.save
-                        end
-                      end
+                      add_network("Classmates", person, result[:url].split("regId=")[1], result[:url] ) { classmates(result[:url]) }
                     when /twitter.com/i
-                      if networks_exist?(person.networks, "Twitter")
-                        person.networks << Network.new({:name => "Twitter", :url => result[:url], :nickname => result[:url].split("/").last, :info => twitter(result[:url]), :found_by => @info[:name]})
-                        Display.msg "-\t< Twitter"
-                        person.save
-                      end
+                      add_network("Twitter", person, result[:url].split("/").last, result[:url] ) { twitter(result[:url]) }
                     when /plaxo.com/i
-                      if networks_exist?(person.networks, "Plaxo")
-                        person.networks << Network.new({:name => "Plaxo", :url => result[:url],  :nickname => result[:url].split("/").last, :info => {}, :found_by => @info[:name]})
-                        Display.msg "-\t< Plaxo"
-                        person.save
-                      end
+                      add_network("Plaxo", person, result[:url].split("/").last, result[:url] )
                     when /plus.google.com|profiles.google.com/i
-                      if networks_exist?(person.networks, "GooglePlus")
-                        person.networks << Network.new({:name => "GooglePlus", :url => result[:url],  :nickname => result[:url].split("/").last, :info => googleplus(result[:url]), :found_by => @info[:name]})
-                        Display.msg "-\t< GooglePlus"
-                        person.save
-                      end
+                      add_network("GooglePlus", person, result[:url].split("/").last, result[:url] ) { googleplus(result[:url]) }
                     when /facebook.com/i
-                      if networks_exist?(person.networks, "Facebook")
-                        person.networks << Network.new({:name => "Facebook", :url => result[:url], :nickname => result[:url].split("/").last, :info => {}, :found_by => @info[:name]})
-                        Display.msg "-\t< Facebook"
-                        person.save
-                      end
+                      add_network("Facebook", person, result[:url].split("/").last, result[:url] )
                     when /ziggs.com/i
-                      if networks_exist?(person.networks, "Ziggs")
-                        if info[:company] == @options[:company]
-                          person.networks << Network.new({:name => "Ziggs", :url => result[:url], :nickname => result[:url].split("/").last, :info => ziggs(result[:url]), :found_by => @info[:name]})
-                          Display.msg "-\t< Ziggs"
-                          person.save
-                        end
-                      end
+                      add_network("Ziggs", person, result[:url].split("/").last, result[:url] ) { ziggs(result[:url]) }
                     when /xing.com/i
-                      if networks_exist?(person.networks, "Xing")
-                        person.networks << Network.new({:name => "Xing", :url => result[:url], :nickname => result[:url].split("/").last, :info => {}, :found_by => @info[:name]})
-                        Display.msg "-\t< Xing"
-                        person.save
-                      end
+                      add_network("Xing", person, result[:url].split("/").last, result[:url] )
                     else
                       Display.debug "Currently not parting #{result[:url]}"
                     end
                   rescue Exception => e
-                    Display.error "Something went wrong with #{person.name + " " + person.last}" + e
+                    Display.error "Something went wrong with #{person.name + " " + person.last}" + e.to_s
                   end
                 end
               end
-              person[:interestinglinks] = google[0..25]
+              # Temporarily off until I can find a practical way of encoding this to UTF-8.
+              # I've tried many things but mongodb keeps on failing when trying to save it. ARGHHH !!!!
               person.save(:validate => true)
+
+              begin 
+                person[:interestinglinks] = google[0..25]
+                person.save(:validate => true)
+              rescue
+                Display.error "[SocialProfiling] - Interesting Links save action failed. UTF-8 Not suported."
+              end
+              
             end
           else
-            Display.error "Needo to provide a company name"
+            handle_error :error => e
           end
         end
       end

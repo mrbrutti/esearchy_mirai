@@ -28,7 +28,7 @@ else
 end
 
 GEM_PATH="gem"
-MONGO_VERSION="2.0.6"
+MONGO_VERSION="2.4.3"
 require 'rubygems'
 #require 'readline'
 require 'getoptlong'
@@ -45,7 +45,7 @@ opts.each do |opt, arg|
       puts "H  E  L  P:\n"
       puts ""
       puts "\t--help, -h"
-      puts "\t\tell I guess you know this one."
+      puts "\t\tWell I guess you know this one."
       puts ""
       puts "\t--gem-path, -g"
       puts "\t\pProvide gem path"
@@ -210,20 +210,11 @@ end
 
 
 #Current gem needs
-gem_available? "mongo"
-gem_available? "bson_ext"
-gem_available? "mongo_mapper"
-gem_available? 'json'
-gem_available? 'zip'
-gem_available? 'nokogiri'
-gem_available? 'readline-history-restore'
-gem_available? 'spidr'
+Display.msg "Installing Bundler"
+gem_available? "bundler"
 
-# Currently not being used.
-#gem_available? "sinatra"
-#gem_available? "restclient"
-#gem_available? 'uri'
-#gem_available? 'pdf_reader'
+Display.msg "Installing gems"
+system "bundle install"
 
 #Add any other dependencies installations, if you add any later on.
 # gem_available? 'xxx'

@@ -1,0 +1,240 @@
+<style>
+  .table_pic {
+    border-radius: 4px;
+  }
+
+  .buttom_column {
+    opacity: 0.1;
+  }
+
+  .buttom_column:hover {
+    opacity: 1.0;
+  }
+
+  .clean_link {
+    text-decoration: none;
+    color: #999999;
+  }
+
+  .clean_link:hover {
+    text-decoration: none;
+  }
+</style>
+
+<div class="row">
+  <div class="span12">
+    <div class="row">
+      <div class="span6">
+        <h3>Project:&nbsp;&nbsp;<spam class="text-success"><%= @project['name'] %></span>
+          <a class="buttom_column" role="button" data-toggle="modal" data-target="#NewProjectModal" href="/projects/<%= @project['_id']%>/edit"><i class="icon-eye-open"></i></a> 
+        </h3>
+        <h5>Company:&nbsp;&nbsp;<spam class="muted"><%= @project['company'] %></span></h5>
+        <h5>Domain:&nbsp;&nbsp;
+          <spam class="muted">
+            <a class="clean_link" href="<%= @project['domain'] || "#" %>"><%= @project['domain'] || "" %></a>
+          </span>
+        </h5>
+        <h5>Query:&nbsp;&nbsp;<spam class="muted"><%= @project['query'] %></span></h5>
+      </div>
+    </div>
+    <ul class="nav nav-tabs">
+      <li class="active">
+        <a href="#People" data-toggle="tab">
+          <h5 id="people" >People <spam class="text-error" style="font-size:11px;"><%= @people.count == 0 ? "" : @people.count || 0 %></spam> </h5>
+        </a>
+      </li>
+      <li>
+        <a href="#Emails" data-toggle="tab">
+          <h5 id="emails" >Emails <spam class="text-error" style="font-size:11px;"><%= @emails_size %></spam></h5>
+        </a>
+      </li>
+      <li><a href="#Maps" data-toggle="tab"><h5 id="maps" >Maps</h5></a></li>
+      <li><a href="#Drones" data-toggle="tab"><h5 id="maps" >Drones</h5></a></li>
+      <li><a href="#Logs" data-toggle="tab"><h5 id="logs" >Logs</h5></a></li>
+      <li><a href="#Extras" data-toggle="tab"><h5 id="extras" >Extras</h5></a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="People">
+        <% if @people.size != 0 %>
+          <%= erb :people_table %>
+        <% else %>
+          <h5 class="text-warning">&nbsp;&nbsp;&nbsp;&nbsp;Empty ... </h5>
+        <% end %>
+      </div>
+      <div class="tab-pane" id="Emails">
+        <% if @project['emails'] %>
+        <% if @project['emails'].size != 0 %>
+          <table class="table table-condensed table-hover" id="emails_table">
+            <thead>
+              <th>email</th>
+              <th>found_by</th>
+              <th>Registered_at</th>
+              <th>found_url</th>
+              <th></th>
+            </thead>
+            <tbody>
+              <% @project['emails'].each do |email| %>
+              <tr>
+                <td><%= email['email'] %></td>
+                <td><%= email['found_by'].join(" ") %></td>
+                <td>
+                  <% if email['sites'] %>
+                    <% email['sites'].each do |k,v| %>
+                      <span><%= k %></span>
+                    <% end %>
+                  <% end %>
+                </td>
+                <td>
+                  <a href="<%= email['url'] %>">
+                    <%= email['url'].split("/")[0..2].join("/") %>
+                  </a>
+                </td>
+                <td>
+                  <div id="buttom_column">
+                    <a class="btn btn btn-mini" href="/projects/<%= @project['_id'] %>/emails/<%= email['_id']%>/delete">
+                      <i class="icon-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% else %>
+          <h5 class="text-warning">&nbsp;&nbsp;&nbsp;&nbsp;Empty ...</h5>
+        <% end %>
+        <% else %>
+          <h5 class="text-warning">&nbsp;&nbsp;&nbsp;&nbsp;Empty ...</h5>
+        <% end %>
+      </div>
+      <div class="tab-pane" id="Maps">
+        <% if @geolocations.size != 0 %>
+
+        <div class="row" >
+          <div class="span12">
+            <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+            <script src="/js/maps/OpenLayers.js"></script>
+            <script src="/js/maps/mxn.js?(googlev3) " type="text/javascript"></script>
+            <div id="map_canvas"></div>
+            <script type="text/javascript">
+              var map = new mxn.Mapstraction('map_canvas', 'googlev3'); 
+              map.addLargeControls();
+              map.addMapTypeControls(); 
+              <% @geolocations.each do |info| %>
+                <% if info != "," %>
+                var person = new mxn.Marker(new mxn.LatLonPoint(<%= info[:geolocation] %>));
+                person.setInfoBubble('<div style="float:left; margin-right: 10px;"><img src="<%= info[:icon] %>"></div> <div style="float:left; max-width: 220px;"><b>Name: </b> <%= h info[:name] %>  <%= h info[:last] %></br><b>Network: </b><%= info[:network] %></br><b>Profile:</b> <a href="<%= info[:link] %>">Link</a></br> <b>Location:</b> <%= h info[:location] %></br></div>');
+                person.setLabel('<%= h info[:name]%> <%= h info[:last] %>');
+                person.setIcon('http://localhost:9292/img/map_icon.png');
+                person.setIconSize([30,30]);
+                person.setIconAnchor([30,30]);
+                map.addMarker(person);
+                <% end %>
+              <% end %>
+              map.autoCenterAndZoom();
+            </script>
+          </div>
+        </div>
+        <% else %>
+         <p> No GeoLocation data available </p>
+        <% end %>
+      </div>
+      <div class="tab-pane" id="Drones">
+        <% if @project['drones'] %>
+        <% if @project['drones'].size != 0 %>
+          <table class="table table-condensed table-hover" id="emails_table">
+            <thead>
+              <th>Drone</th>
+              <th>hostname</th>
+              <th>username</th>
+              <th>Status</th>
+              <th></th>
+            </thead>
+            <tbody>
+              <% @drones.each do |drone| %>
+              <tr>
+                <td><%= drone['name'] %></td>
+                <td><%= drone['hostname'] %></td>
+                <td><%= drone['username'] %></td>
+                <td>
+                  <% if drone['status'] %>
+                    <span class="label label-success">Up</span>
+                  <% else %>
+                    <span class="label label-important">Down</span>
+                  <% end %>
+                </td>
+                <td>
+                  <div id="buttom_column" class="btn-group" >
+                    <a class="btn btn btn-mini" href="/drones/<%= drone['_id'] %>/info">
+                      <i class="icon-eye-open"></i>
+                    </a>
+                    <a class="btn btn btn-mini" href="/drones/<%= drone['_id'] %>/projects/<%=@project['_id'] %>/sync">
+                      <i class="icon-refresh"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% else %>
+          <h5 class="text-warning">&nbsp;&nbsp;&nbsp;&nbsp;Empty ...</h5>
+        <% end %>
+        <% else %>
+          <h5 class="text-warning">&nbsp;&nbsp;&nbsp;&nbsp;Empty ...</h5>
+        <% end %>
+      </div>
+      <div class="tab-pane" id="Logs">
+        <% if @pluginruns != 0 %>
+        <table class="table table-condensed table-hover">
+          <thead>
+            <th>Host</th>
+            <th>Name</th>
+            <th>Project</th>
+            <th>Status</th>
+            <th>Created_at</th>
+            <th>Stop_at</th>
+          </thead>
+          <tbody>
+            <% @pluginruns.each do |run| %>
+              <tr onclick="$('#<%= run['_id']%>').toggle('slow');">
+                <td><spam style="color: #a9b9c7;"><%= run['hostname'] %></spam></td>
+                <td><%= run['plugin'] %></td>
+                <td><%= run['project'] %></td>
+                <% if run['status'] == "DONE" %>
+                <td><span class="label label-success"><%= run['status'] %></span></td>
+                <% elsif run['status'] == "FAILED"%>
+                <td><span class="label label-important"><%= run['status'] %></span></td>
+                <% else %>
+                <td><span class="label label-info"><%= run['status'] %></span></td>
+                <% end %>
+                <td><%= run['created_at'].asctime %></td>
+                <td><%= run['stop_at'].nil? ? "" : run['stop_at'].asctime %></td>
+              </tr>
+              <% if run['error'] != nil %>
+                <tr id="<%= run['_id']%>" style="display:none;">
+                  <td></td>
+                  <td colspan="5">
+                    <b><%= run['error'] %></b></br>
+                    <small>
+                    <%= run['error_details'] %>
+                    </small>
+                  </td>
+                </tr>
+              <% end %>
+            <% end %>
+          </tbody>
+        </table>
+        <% else %>
+          <h4>Empty...</h4>
+        <% end %>
+      </div>
+      <div class="tab-pane" id="Extras">
+        <p> nothing here yet </p>
+      </div>
+    </div>
+  </div>
+
+
+<br/>

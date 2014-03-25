@@ -8,6 +8,10 @@ class Display
     COLOR_CODE + "[31m"
   end
 
+  def self.backred
+    COLOR_CODE + "[41m"
+  end
+
   def self.blue
     COLOR_CODE + "[34m"
   end
@@ -24,6 +28,10 @@ class Display
     COLOR_CODE + "[31m"
   end
 
+  def backred
+    COLOR_CODE + "[41m"
+  end
+
   def blue
     COLOR_CODE + "[34m"
   end
@@ -37,11 +45,11 @@ class Display
   end
 
   def self.error(message)
-    puts red() + "[!]" + default + " - #{message}"
+    puts red() + "[!]" + " - #{message}" + default if $verbose
   end
   
   def self.debug(message)
-    puts red + "[#]" + default + " - #{message}" if $debug
+    puts red + "[#]"  + " - #{message}" + default if $debug
   end
 
   def self.print(message)
@@ -49,7 +57,7 @@ class Display
   end
     
   def self.warn(message)
-    puts yellow + "[!]" + default + " - #{message}"
+    puts yellow + "[!]"  + " - #{message}" + default
   end
   
   def self.msg(message)
@@ -57,7 +65,15 @@ class Display
   end
   
   def self.help(message)
-    puts blue + "[|]" + default + "   #{message}"
+    puts blue + "[|]" + "   #{message}" + default
+  end
+
+  def self.backtrace backtrace
+    if $backtrace
+      backtrace.each do |x| 
+        puts backred + "* BACKTRACE | " + x.to_s + " | BACKTRACE * " + default 
+      end 
+    end
   end
 
   def self.logo
@@ -68,6 +84,8 @@ class Display
     puts red + "/_______  /" + default + "_______  /\\___  >____  /__|    \___  >___|  / ____|"
     puts red + "        \\/" + default + "        \\/     \\/     \\/            \\/    \\/\\/  #{ESearchy::VERSION}"
   end
+
+
 
   def self.hash(opt = {})
     opt.each do |k,v|

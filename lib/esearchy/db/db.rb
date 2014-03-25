@@ -35,5 +35,15 @@ module ESearchy
 		rescue
 			Display.error "Looks like there is nothing to shutdown"
 		end
+
+		def self.redis
+			Display.msg "Starting Redis Database"
+			system("redis-server &")
+			sleep(1)
+			Display.msg "Starting Redis Plugin Queue"
+			system("bundle exec resque work -q plugin -r ../lib/esearchy/drone/workers.rb &")
+		rescue
+			Display.error "Something went bad starting Redis database or queue"
+		end
 	end
 end

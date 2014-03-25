@@ -264,7 +264,7 @@ module ESearchy
             Display.debug "Antiword not found. Parsing word as plain text."
             # This ///G h e t t o/// but, for now it works on emails that do not contain Capital letters:).
             # Last resort, but hey it might fish something worth it.
-            return search_emails(File.open(name).readlines[0..19].to_s)
+            return search_emails(File.open(name).readlines[0..19].join)
           end
         end
 

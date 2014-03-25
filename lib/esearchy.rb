@@ -20,7 +20,7 @@ if RUBY_PLATFORM =~ /mingw|mswin/
  require 'win32console'
 end
 
-PATH = '../lib/esearchy/'
+PATH ||= 'esearchy/'
 #ESEARCHY REQUIRES
 ['db/db','db/mapper', 'helpers/display', 'helpers/useragent', 'helpers/search','esearchy', 'baseplugin',
   'ui/common', 'ui/commandparser', 'ui/command/project', 'ui/command/person','ui/console', 'parsers/people', 
@@ -35,7 +35,28 @@ module Net
 
         def initialize(*args)
             old_initialize(*args)
-            @read_timeout = 2  # 2 seconds
+            @read_timeout = 4  # 2 seconds
         end
     end
+end
+
+require 'iconv' unless String.method_defined?(:encode)
+
+def encode_string( s )
+  if String.method_defined?(:encode)
+    s.encode!('UTF-16', 'UTF-8', :invalid => :replace, :replace => '')
+    s.encode!('UTF-8', 'UTF-16')
+  else
+    ic = Iconv.new('UTF-8', 'UTF-8//IGNORE')
+    s = ic.iconv(s)
+  end
+  return s
+end
+
+
+module OpenURI
+  def OpenURI.redirectable?(uri1, uri2) # :nodoc:
+    uri1.scheme.downcase == uri2.scheme.downcase ||
+    (/\A(?:https?|ftp)\z/i =~ uri1.scheme && /\A(?:https?|ftp)\z/i =~ uri2.scheme)
+  end
 end

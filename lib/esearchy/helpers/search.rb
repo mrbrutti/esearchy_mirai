@@ -5,12 +5,15 @@ module ESearchy
   module Helpers
     module Search      
       def google
-        Display.debug "Entering Google Search for query= #{@options[:query]}"
+        Display.debug "Entering Google Search for query= #{"http://www.google.com/cse?&safe=off&num=100&site=&q=" +  @options[:query]  + "&btnG=Search&start=" + @options[:start].to_s}"
 
+        begin 
+          search = open("http://www.google.com/cse?&safe=off&num=100&site=&q=" +  @options[:query]  + "&btnG=Search&start=" + @options[:start].to_s)
+        rescue Exception => e
+          Display.error "Something went wrong while rendering the page #{e.to_s}"
+        end
 
-        doc = Nokogiri::HTML(open("http://www.google.com/cse?&safe=off&num=100&site=&q=" +  
-                                    @options[:query]  + "&btnG=Search&start=" + @options[:start].to_s))
-
+        doc = Nokogiri::HTML(search)
         # For the first search extract results.
         if @options[:start] == 0 
           result_qnty = doc.search('div[@id="resultStats"]')
@@ -30,7 +33,7 @@ module ESearchy
             begin
               url = result.search('h3[@class="r"]')[0].search('a')[0]['href']
               if url.match(/\/url\?q=/) != nil
-                res_url = url.scan(/\/url\?q=([0-9A-Za-z:\\\/?=@+%.;"'()_-]+)\&/).to_s
+                res_url = url.scan(/\/url\?q=([0-9A-Za-z:\\\/?=@+%.;"'()_-]+)\&/).join
               else
                 res_url = url
               end
@@ -50,9 +53,15 @@ module ESearchy
       end
     
       def bing
-        doc = JSON.parse(open("https://api.datamarket.azure.com/Bing/Search/Web?Query=%27" + 
-                               CGI.escape(@options[:query]) + "%27&$format=json&$top=50&$skip=" + @options[:start].to_s , 
-                               :http_basic_authentication=>[$globals[:bingkey],$globals[:bingkey]]).readlines[0])
+        begin 
+          search = open("https://api.datamarket.azure.com/Bing/Search/Web?Query=%27" + 
+                        CGI.escape(@options[:query]) + "%27&$format=json&$top=50&$skip=" + @options[:start].to_s , 
+                        :http_basic_authentication=>[$globals[:bingkey],$globals[:bingkey]]).readlines[0]
+        rescue Exception => e
+          Display.error "It looks like were are being blocked (#{e.to_s}). Change engine."
+        end
+
+        doc = JSON.parse(search)
 
         # OLD URL
         # doc = JSON.parse(open("http://api.search.live.net/json.aspx?AppId=" + $globals[:bingkey] + 
@@ -79,7 +88,15 @@ module ESearchy
       end
 
       def baidu
-        doc = Nokogiri::HTML(open("http://www.baidu.com/s?wd=" + @options[:query] + "&rn=100&pn=" + @options[:start].to_s))
+        begin
+          search = open("http://www.baidu.com/s?wd=" + @options[:query] + "&rn=100&pn=" + @options[:start].to_s)
+        rescue Exception => e
+          Display.error "It looks like were are being blocked (#{e.to_s}). Change engine."
+          return []
+        end
+
+        doc = Nokogiri::HTML(search)
+
         # For the first search extract results.
         if @options[:start] == 0
           if doc.search('span[@class="nums"]') != nil
@@ -116,18 +133,39 @@ module ESearchy
             add
           end
         rescue Exception => e
-          Display.msg "Something went wrong with Search. " + e
-          Display.debug "BACKTRACE\n" + e.backtrace.map {|x| x.to_s + "\n" }.to_s + "BACKTRACE"
+          Display.error "Something went wrong with Search. " + e.to_s
+          Display.backtrace e.backtrace
+        end
+      end
+
+      def engine
+        #Display.debug "I am checking engine options."
+        if @options[:engine].nil?
+          google
+        else
+          #Display.msg "Using non-default engine for search: #{@options[:engine]}"
+          case @options[:engine]
+          when /google/i
+            google
+          when /baidu/i
+            baidu
+          when /bing/i
+            bing
+          else
+            google
+          end
         end
       end
 
       private
       def total?
-      ( @options[:stop].to_i >= @options[:start].to_i + @info[:num] && @options[:results] >= @options[:start].to_i ) ? true : false
+      ( @options[:stop].to_i >= @options[:start].to_i + 
+        @info[:num] && @options[:results] >= @options[:start].to_i ) ? true : false
       end
 
       def _end_
-        (@options[:start].to_i + @info[:num].to_i) > @options[:results] ? @options[:results] : @options[:start].to_i + @info[:num]
+        (@options[:start].to_i + @info[:num].to_i) > @options[:results] ? 
+        @options[:results] : @options[:start].to_i + @info[:num]
       end
 
       def add
@@ -135,39 +173,4 @@ module ESearchy
       end
     end
   end
-end 
-
-#         
-#     def document?(url)
-#       url.scan(/(.pdf$|.doc$|.docx$|.xlsx$|.pptx$|.odt$|.odp$|.ods$|.odb$|.txt$|.rtf$|.ans$|.csv$)/i) == [] ? false :true
-#     end
-#
-#     def parse_html ( array )
-#       array.each do |a|
-#         case a[0]
-#         when /(PDF|DOC|XLS|PPT|TXT)/
-#           @documents << [a[1],"."+$1.to_s.downcase]
-#         when nil
-#           if a[2] =~ /(.pdf$|.doc$|.docx$|.xlsx$|.pptx$|.odt$|.odp$\
-#.ods$|.odb$|.txt$|.rtf$|.ans$|.csv$)/i
-#             @documents << [a[2],$1.to_s.downcase]
-#           end
-#         when /(.pdf$|.doc$|.docx$|.xlsx$|.pptx$|.odt$|.odp$|.ods$|.odb$|.txt$|.rtf$|.ans$|.csv$)/i
-#           @documents << [CGI.unescape(a[2] || ""),$1.to_s.downcase]
-#         else
-#           #D "I do not parse this doc's \"#{a}\" filetype yet:)"
-#         end
-#       end
-#     end
-#     
-#     def parse_json ( json )
-#       json.each do |j|
-#         case j["url"]
-#         when /(.pdf$|.doc$|.docx$|.xlsx$|.pptx$|.odt$|.odp$|.ods$|.odb$|.txt$|.rtf$|.ans$|.csv$)/i
-#           @documents << [j["url"],$1.to_s.downcase]
-#         else
-#           @urls << [j["url"],$1.to_s.downcase]
-#         end
-#       end
-#     end
-#     
+end

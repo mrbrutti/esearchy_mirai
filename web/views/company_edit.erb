@@ -1,0 +1,29 @@
+<form id="edit_create" action="/projects/save" method="post">
+	<input type="hidden" id="project_id" name="id" value="<%= @project['_id']%>">
+	<p>
+  	<label for="user_name">Project Name: </label>
+  	<input type="text" id="project_name" name="project[name]" value="<%= @project['name']%>">
+  </p>
+  <p>
+  	<label for="user_name">Company Name: </label>
+  	<input type="text" id="project_company" name="project[company]" value="<%= @project['company']%>" >
+  </p>
+  <p>
+  	<label for="user_name">Domain Name: </label>
+  	<input type="text" id="project_domain" name="project[domain]" value="<%= @project['domain']%>" >
+  </p>
+  <p>
+  	<label for="user_name">Query: </label>
+  	<input type="text" id="project_query" name="project[query]" value="<%= @project['query']%>">
+  </p>
+  <p>
+    <label for="Drones">Drones: </label>
+    <select type="text" id="project_drones" multiple="4" name="project[drones][]" >
+    <% settings.drone_list.each do |drone| %>
+      <option value="<%= drone[1] %>" <% if @project['drones'] %> <% if @project['drones'].include?("#{drone[1]}") %> selected="selected" <%end %> <%end %> ><%= drone[0] %></option>
+    <% end %>
+    </select>
+  </p>
+
+  <p><input class="btn" type="submit" value="Save"></p>
+</form>

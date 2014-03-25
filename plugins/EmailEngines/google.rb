@@ -28,7 +28,7 @@ module ESearchy
       end
       
       def run
-        if @options[:query] != ""
+        if @options[:query] != "" and @options[:query] != nil
           Display.msg "[ '+' => New, '=' => Existing ]"
           search_engine do
             parse google

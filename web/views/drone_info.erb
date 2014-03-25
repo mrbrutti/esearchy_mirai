@@ -1,0 +1,101 @@
+<div class="row">
+  <div class="span12">
+    <div class="row">
+      <div class="span7">
+        <h3>Drone:&nbsp;&nbsp;<spam class="text-success"><%= @drone['name'] %></span></h3>
+        <h5>Hostname:&nbsp;&nbsp;<spam class="muted"><%= @drone['hostname'] %></span></h5>
+        <h5>Username:&nbsp;&nbsp;<spam class="muted"><%= @drone['username'] %></span></h5>
+        <h5>Password:&nbsp;&nbsp;<spam class="muted">********</span></h5>
+        <br/>
+      </div>
+    </div>
+
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#Plugins" data-toggle="tab"> <h5 id="plugins" >Plugins</h5></a></li>
+      <li><a href="#Logs" data-toggle="tab"><h5 id="logs" >Logs</h5></a></li>
+      <li><a href="#Extras" data-toggle="tab"><h5 id="extras" >Extras</h5></a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="Plugins">
+      <%if @plugins %>
+      <table class="table table-condensed table-hover" id="plugin_table">
+        <thead>
+          <th>Name</th>
+          <th>Description</th>
+          <th></th>
+        </thead>
+        <tbody>
+          <% @plugins.each do |plugin| %>
+          <tr>
+            <td><span><%= plugin['name'].upcase %></span></td>
+            <td><%= plugin['description'] %></td>
+            <td>
+              <a href="/drones/<%= @drone['_id'] %>/plugins/<%= plugin['name'] %>/run" role="button" data-toggle="modal" data-target="#RunPluginModal" class="btn btn btn-mini">Run</a>
+            </td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <% else %>
+      <h5 class="text-error">&nbsp;&nbsp;&nbsp;&nbsp;Disconnected ... </h5>
+      <% end %>
+    </div>
+    <div class="tab-pane" id="Logs">
+      <%if @plugins %>
+      <table class="table table-condensed table-hover" id="running_table">
+        <thead>
+          <th>Host</th>
+          <th>Name</th>
+          <th>Project</th>
+          <th>Status</th>
+          <th>Created_at</th>
+          <th>Stop_at</th>
+        </thead>
+        <tbody>
+          <% @pluginruns.each do |run| %>
+            <tr onclick="$('#<%= run['id']%>').toggle('slow');">
+              <td><spam style="color: #a9b9c7;"><%= run['hostname'] %></spam></td>
+              <td><%= run['plugin'] %></td>
+              <td><%= run['project'] %></td>
+              <% if run['status'] == "DONE" %>
+              <td><span class="label label-success"><%= run['status'] %></span></td>
+              <% elsif run['status'] == "FAILED"%>
+              <td><span class="label label-important"><%= run['status'] %></span></td>
+              <% else %>
+              <td><span class="label label-info"><%= run['status'] %></span></td>
+              <% end %>
+              <td><%= run['created_at'] %></td>
+              <td><%= run['stop_at'] %></td>
+            </tr>
+            <% if run['error'] != nil %>
+              <tr id="<%= run['id']%>" style="display:none;">
+                <td></td>
+                <td colspan="5">
+                  <b><%= run['error'] %></b></br>
+                  <small>
+                  <%= run['error_details'] %>
+                  </small>
+                </td>
+              </tr>
+            <% end %>
+          <% end %>
+        </tbody>
+      </table>
+      <% else %>
+      <h5 class="text-error">&nbsp;&nbsp;&nbsp;&nbsp;Disconnected ... </h5>
+      <% end %>
+    </div>
+    <div class="tab-pane" id="Extras">
+    </div>
+  </div>
+</div>
+<div id="RunPluginModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">Run Plugin: </h3>
+  </div>
+  <div class="modal-body">
+  </div>
+</div>
+

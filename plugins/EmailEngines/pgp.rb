@@ -41,7 +41,7 @@ module ESearchy
             Display.error "Needo to provide a query. (i.e. @company.com)."
           end
         rescue Exception => e
-          Display.debug "Something went wrong parsing an email" + e
+          handle_error :error => e, :message => "Something went wrong parsing an email"
         end
       end
     end

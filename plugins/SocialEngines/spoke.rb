@@ -39,16 +39,15 @@ module ESearchy
       
       private
       def parse( results )
-        ts = []
         results.each do |result|
-          #ts << Thread.new {
-            begin
-              name_last = result[:title].scan(/[\w\s]*,/)[0]
-              if name_last != nil && name_last != " |"
-                name_last = name_last.gsub(/[profiles*|,]*/i,"").strip.split(" ")
-                name = name_last[0]
-                last = name_last[1]
-                if (name.strip != "" || last.strip != "") && (name != nil || last != nil) 
+          begin
+            name_last = result[:title].scan(/[\w\s]*,/)[0]
+            if name_last != nil && name_last != " |"
+              name_last = name_last.gsub(/[profiles*|,]*/i,"").strip.split(" ")
+              name = name_last[0]
+              last = name_last[1]
+              if (name != nil || last != nil)
+                if (name.strip != "" || last.strip != "") 
                   if result[:url].match(/http[s]*:\/\/www.spoke.com\/info\//) != nil
                     info = spoke(result[:url])
                     if info[:company] != nil
@@ -84,12 +83,11 @@ module ESearchy
                   end
                 end
               end
-            rescue Exception => e
-              Display.debug "Something went wrong." + e
             end
-          #}
+          rescue Exception => e
+            handle_error :error => e
+          end
         end
-        #ts.each {|t| t.join }
         return nil
       end
     end

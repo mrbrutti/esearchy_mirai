@@ -1,0 +1,94 @@
+<table id="people_all" class="table table-condensed table-hover">
+  <thead>
+    <th></th>
+    <th>Name</th>
+    <th>Last</th>
+    <th>Occupation</th>
+    <th>Net(s)</th>
+    <th>Found_by</th>
+    <th>URL</th>
+    <th></th>
+  </thead>
+  <tbody>
+	<% @people.each do |person| %>
+      <tr onclick="$('.<%= person['_id']%>').toggle('slow');">
+      	<td>
+      		<img class="table_pic" style="height:30px; width:30px;" src="<%= ( ( person["networks"][0]["info"]["photo"] == "˚∫" || person["networks"][0]["info"]["photo"] == nil) ? "/img/no_face.jpg" : person["networks"][0]["info"]["photo"] ) ||  person["networks"][1]["info"]["photo"] || "/img/no_face.jpg" %>">
+      	</td>
+        <td><b><%= person["name"] %><b></td>
+        <td><b><%= person["last"] %><b></td>
+        <td><span class="muted"><%= person["networks"][0]["info"]["title"][0..80] %></span></td>
+        <td><span class="badge badge-success">
+        	<% if person['networks'] %>
+        		<%= person['networks'].size %>
+        	<%else %>
+        	0
+        	<% end %>
+        </span></td>
+        <td><%= person["found_by"].join(",") %></td>
+        <td>
+          <% person['found_at'].each do |link| %>
+            <a href="<%= link %>"><%= link.split("/")[0..2].join("/") %></a>
+          <% end %>
+        </td>
+        <td>
+            <div id="buttom_column" class="btn-group">
+              <a class="btn btn btn-mini" href="/projects/<%= person['project_id']%>/people/<%= person['_id']%>/details">
+                <i class="icon-eye-open"></i>
+              </a>
+              <a class="btn btn btn-mini" href="/projects/<%= person['project_id']%>/people/<%= person['_id']%>/raw">
+                <i class="icon-cog"></i>
+              </a>
+              <a class="btn btn btn-mini" href="/projects/<%= person['project_id']%>/people/<%= person['_id']%>/edit">
+                <i class="icon-edit"></i>
+              </a>
+              <a class="btn btn btn-mini" href="/projects/<%= person['project_id']%>/people/<%= person['_id']%>/delete">
+                <i class="icon-trash"></i>
+              </a>
+            </div>
+        </td>
+      </tr>
+      <% if person['networks'] %>
+      	<tr class="<%= person['_id']%>" style="display:none; background:#dddddd;"><td colspan="8"><h6>Networks</h6></td><tr>
+      <% person['networks'].each do |network| %>
+      	<tr class="<%= person['_id']%>" style="display:none; background:#f9f9f9;">
+        	<td></td>
+        	<td><%= network['name'] %></td>
+        	<td><%= network['nickname'] %></td>
+        	<td colspan="3"></td>
+        	<td><a href="<%= network['url'] %>"><%= network['url'].split("/")[0..2].join("/") %></a></td>
+        	<td>
+        		<div id="buttom_column" style="float:right;" class="btn-group">
+        		<a class="btn btn btn-mini" href="/projects/<%= person['project_id'] %>/people/<%= person['_id'] %>/network/<%= network['_id'] %>/delete">
+        			<i class="icon-trash"></i>
+        		</a>
+        		</div>
+        	</td>
+        </tr>
+        <tr rowspan="<%= network['info'].size %>" class="<%= person['_id']%>" style="display:none; background:#f9f9f9;">
+        	<td></td>
+        	<td><img class="table_pic" style="height:70px; width:70px;" src="<%= ( ( network['info']["photo"] == "˚∫" || network['info']["photo"] == nil) ? "/img/no_face.jpg" : network['info']["photo"] ) ||  network['info']["photo"] || "/img/no_face.jpg" %>"></td>
+        	<td colspan="7">
+        		<% network['info'].each do |k,v| %>
+        			<p><b><%=k%>:</b> <%=v%></p>
+        		<% end %>
+        	</td>
+        </tr>
+      <% end %>
+    <% end %>
+   	<% if person['interestinglinks'] %>
+      	<tr class="<%= person['_id']%>" style="display:none; background:#dddddd;" ><td colspan="8"><h6>Interesting Links</h6></td><tr>
+      <% person['interestinglinks'].each do |link| %>
+      	<tr class="<%= person['_id']%>" style="display:none; border-top: 1px solid #ffffff; background:#f9f9f9;">
+        	<td colspan="2"></td>
+        	<td colspan="4"><%= link['title'] %></td>
+        	<td colspan="2" >
+        		<a href="<%= link['url'] %>"><%= link['url'].split("/")[0..2].join("/") %></a>
+        	</td>
+        </tr>
+      <% end %>
+    <% end %>
+    <tr class="<%= person['_id']%>" style="display:none; background:#dddddd;" ><td colspan="8"><h6></h6></td><tr>
+    <% end %>
+  </tbody>
+</table>

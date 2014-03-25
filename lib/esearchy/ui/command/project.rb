@@ -27,6 +27,8 @@ module ESearchy
 					else
 						@options[:name] = args[0].downcase
 						@project = Project.new(@options)
+						@project.created_at = Time.now
+						@project.updated_at = @project.created_at
 						@project.save
 						Display.msg "Successfuly created project #{args[0]}"
 					end
@@ -70,6 +72,7 @@ module ESearchy
 					@project.domain 	= @options[:domain]
 					@project.url 		= @options[:url]
 					@project.company 	= @options[:company]
+					@project.updated_at = Time.now
 					@project.save
 				rescue Exception => e
 					Display.error "Something went wrong running the command." + e

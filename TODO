@@ -44,3 +44,9 @@ TODO:
 * Change BING API to be parsed just like Baidu and Google no more Free API. :( #DEADLINE : June 1
 *
 
+WEB ------------------------------
+----------
+* Improve maps using clusters. 
+http://www.appelsiini.net/2008/11/introduction-to-marker-clustering-with-google-maps
+http://www.svennerberg.com/2009/01/handling-large-amounts-of-markers-in-google-maps/
+*

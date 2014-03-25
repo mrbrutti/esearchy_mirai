@@ -23,28 +23,28 @@ module ESearchy
       end
       
       def run
+        begin
       		discover @project.emails
+        rescue Exception => e
+          handle_error :error => e
+        end
 			end
 
 			private
 			def discover(emails)
-				ts = []
 				emails.each do |email|
-        	ts << Thread.new {
-        		results = {}
-						(ESearchy::Helpers::Discover.public_methods - Object.methods).each do |site|
-              if ESearchy::Helpers::Discover.send(site, email[:email])
-                Display.msg "[#{@info[:name]}] - Email => #{email[:email]} has an account in #{site[0..-2]}"
-							   results[site[0..-2]] = 1
-              else
-                Display.debug "[#{@info[:name]}] - Email => #{email[:email]} has NO account in #{site[0..-2]}"
-              end 
-						end
-						email[:sites] = results
-            email.save!
-					}
+      		results = {}
+					(ESearchy::Helpers::Discover.public_methods - Object.methods).each do |site|
+            if ESearchy::Helpers::Discover.send(site, email[:email])
+              Display.msg "[#{@info[:name]}] - Email => #{email[:email]} has an account in #{site[0..-2]}"
+						   results[site[0..-2]] = 1
+            else
+              Display.debug "[#{@info[:name]}] - Email => #{email[:email]} has NO account in #{site[0..-2]}"
+            end 
+					end
+					email[:sites] = results
+          email.save!
 				end
-				ts.each {|t| t.join }
 			  @project.save
       end
 		end

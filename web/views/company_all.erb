@@ -1,0 +1,41 @@
+<div class="row">
+  <div class="span12">
+    <h3>Current Projects</h3>
+    <table class="table table-condensed table-hover">
+      <thead>
+        <th>Name</th>
+        <th>Company</th>
+        <th>Domains</th>
+        <th>Drones</th>
+        <th><i class="icon-group"></i></th>
+        <th><i class="icon-envelope-alt"></i></th>
+        <th></th>
+      </thead>
+      <tbody>
+        <% @projects.each do |project| %>
+        <tr>
+          <td><spam style="color: #a9b9c7;"><%= project['name'] %></spam></td>
+          <td><%= project['company'] != "" ? project['company'] : "--" %></td>
+          <td><%= project['domain'] != "" ? project['domain'] : "--" %></td>
+          <td><%= project['drones'] ? project['drones'].size : "--" %></td>
+          <td><span class="badge badge-success"><%= project['people_count'] %></span></td>
+          <td><span class="badge badge-success"><%= project['emails'].nil? ? 0 : project['emails'].size %></span></td>
+          <td>
+            <div id="buttom_column" class="btn-group">
+              <a class="btn btn btn-mini" href="/projects/<%= project['_id']%>/info">
+                <i class="icon-eye-open"></i>
+              </a>
+              <a class="btn btn btn-mini" href="/projects/<%= project['_id']%>/edit" role="button" data-toggle="modal" data-target="#NewProjectModal">
+                <i class="icon-edit"></i>
+              </a>
+              <a class="btn btn btn-mini" href="/projects/<%= project['_id']%>/delete">
+                <i class="icon-trash"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

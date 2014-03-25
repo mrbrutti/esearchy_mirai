@@ -1,0 +1,72 @@
+.table_pic {
+  border-radius: 4px;
+  border: 2px solid #afafaf;
+  max-width: none;
+}
+
+#buttom_column {
+  opacity: 0.1;
+}
+
+#buttom_column:hover {
+  opacity: 1.0;
+}
+
+.clean_link {
+  text-decoration: none;
+  color: #a9b9c7;
+}
+
+.clean_link:hover {
+  text-decoration: none;
+}
+
+.p_field_20 {
+	margin-left: 20px;
+}
+
+.p_field_40 {
+	margin-left: 40px;
+}
+
+.p_field_60 {
+	margin-left: 60px;
+}
+
+.p_field_70 {
+	margin-left: 70px;
+	max-width:400px;
+}
+
+td {
+	font-size: 13px;
+}
+
+#Emails, #People, #Maps, #Extras, #Plugins, #Logs {
+	max-height: 420px;
+}
+
+h5#emails, h5#people, h5#maps, h5#extras, h5#plugins, h5#logs {
+	line-height: 0px;
+}
+
+#map_canvas {
+  height: 400px;
+}
+
+#map_canvas img { 
+  max-width: none;
+}
+
+#map_canvas label { 
+  width: auto; 
+  display:inline; 
+} 
+
+#back_button {
+	margin-bottom: 10px;
+	margin-top: 10px;
+}
+
+
+#NewProjectModal .modal-body {max-height: 800px;}

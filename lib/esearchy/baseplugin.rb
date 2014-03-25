@@ -9,11 +9,14 @@ module ESearchy
       @options[:stop] ||= $globals[:maxhits].to_i
       @options[:results] ||= $globals[:maxhits].to_i
 
-
       block.call(self) if block_given?
     end
     attr_accessor :options
 
+    def self.remote_run(options={}, &block)
+      self.new(options, &block).run
+    end
+    
     def run
       raise "This is just a container."
     end
@@ -32,6 +35,23 @@ module ESearchy
       Display.help "\t" + @info[:desc]
     end
     
+    def error
+      @options[:error]
+    end
+
+    def error_details
+      @options[:error_details]
+    end
+
+    def handle_error(options)
+      Display.debug (options[:message] || "Something went wrong.") + "#{options[:error]}"
+      @options[:error] = (options[:message] || "Something went wrong.") + "#{options[:error]}"
+      if options[:error] !=nil
+        Display.backtrace options[:error].backtrace
+        @options[:error_details] = options[:error].backtrace
+      end
+    end
+
     def self.nombre
       @info[:name]
     end

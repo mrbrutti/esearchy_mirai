@@ -1,0 +1,116 @@
+<% @people.each do |person| %>
+  <div class="row">
+    <div class="span12">
+      <div class="row">
+        <div class="span1" >
+          <img class="table_pic" style="height:70px; width:70px;" src="<%= ( ( person["networks"][0]["info"]["photo"] == "˚∫" || person["networks"][0]["info"]["photo"] == nil) ? "/img/no_face.jpg" : person["networks"][0]["info"]["photo"] ) ||  person["networks"][1]["info"]["photo"] || "/img/no_face.jpg" %>">
+        </div>
+        <div class="span9">
+          <div style="margin-top:-10px;">
+            <h2> <%= person["name"] %> <%= person["last"] %></h2>
+            <h4 style="margin-top:-15px;">
+              <small>
+                <%= person["networks"][0]["info"]["title"] %>
+              </small>
+            </h4>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span1">
+        </div>
+        <div class="span9">
+          <ph4><small><i><b>Found By</b>: <%= person["found_by"].join(",") %><b> at</b>: <%= person["created_at"] %> </i></small></h4>
+        </div>
+      </div>
+      <% if person['networks'] %>
+        <div class="row">
+          <div class="span1">
+          </div>
+          <div class="span9">
+            <h4 onclick="$('#<%= person['_id']%>_foundnetworks').toggle('slow');">Found Networks</h4>
+            <div id="<%= person['_id']%>_foundnetworks" style="padding-left: 10px;">
+              <% person["networks"].each do |network| %>
+                <h4 onclick="$('#<%= person['_id']%>_<%= network['name'] %>_network').toggle('slow');"><%= network['name'] %>
+                  <a href="/people/network/delete?id=<%= network['_id'] %>"><i class="icon-trash"></i></a>
+                </h4>
+                <div id="<%= person['_id']%>_<%= network['name'] %>_network">
+                  <% network.each do |key,val| %>
+                    <% if key == "name" %>
+                    <% elsif key == "info" %>
+                      <p class="p_field_20 "><b><%= key.upcase %></b></p>
+                      <% val.each do |k,v| %>
+                        <% if k == "photo" %>
+                        <% elsif k == "status" %>
+                          <p class="p_field_40"><b class="text-info" ><%= k.upcase %></b>:</p>
+                          <% v.each do |x,y| %>
+                            <p class="p_field_60"><b class="text-info" ><%= x.upcase %></b>: <%= y %> </p>
+                          <% end %>
+                        <% else %>
+                          <% if v.class == Array %>
+                            <p class="p_field_40"><b class="text-info"><%= k.upcase %></b>:</p>
+                            <p class="p_field_70">[ <%= v.map {|x| x.to_s + ", "} %> ]</p>
+                          <% elsif v.class == Hash %>
+                            <p class="p_field_40"><b class="text-info"><%= k.upcase %></b>:</p>
+                              <% v.each do |x,y| %>
+                                <p class="p_field_60"><b class="text-info"><%= x.upcase %></b>: <%= y %> </p>
+                              <% end %>
+                          <% else %>
+                            <p class="p_field_40"><b class="text-info"><%= k.upcase %></b>: <%= v %> </p>
+                          <% end %>
+                        <% end %>
+                      <% end %>
+                    <% elsif key == "person_id" || key == "_id" %>
+                    <% elsif key == "url" %>
+                      <p class="p_field_20"><b class="text-info"><%= key.upcase %></b>: <a href="<%= val %>"><%= val %></a> </p>
+                    <% else %>  
+                      <p class="p_field_20" ><b class="text-info"><%= key.upcase %></b>: <%= val %> </p>
+                    <% end %>               
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      <% if person['interestinglinks'] %>
+        <div class="row">
+          <div class="span1"></div>
+          <div class="span9" >
+            <h4 onclick="$('#<%= person['_id']%>_interestinglinks').toggle('slow');">Interesting Links</h4>
+            <div id="<%= person['_id']%>_interestinglinks">
+              <% person['interestinglinks'].each do |link| %>
+                <h5 style="margin-left: 20px;"><%= link['title'] %></h5>
+                <a style="margin-left: 30px;" href="<%= link['url'] %>"><small><%= link['url'] %></small></a>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      <div class="row">
+        <div class="span1"></div>
+        <div class="span2 offset5">
+          <div>
+            <div id="buttom_column" class="btn-group">
+              <a class="btn btn btn-mini" href="/projects/<%= person['project_id']%>/people/<%= person['_id']%>/details">
+                <i class="icon-eye-open"></i>
+              </a>
+              <a class="btn btn btn-mini" href="/projects/<%= person['project_id']%>/people/<%= person['_id']%>/raw">
+                <i class="icon-cog"></i>
+              </a>
+              <a class="btn btn btn-mini" href="/projects/<%= person['project_id']%>/people/<%= person['_id']%>/edit">
+                <i class="icon-edit"></i>
+              </a>
+              <a class="btn btn btn-mini" href="/projects/<%= person['project_id']%>/people/<%= person['_id']%>/delete">
+                <i class="icon-trash"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br/>
+  <br/>
+<% end %>

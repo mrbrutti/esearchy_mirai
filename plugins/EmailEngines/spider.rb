@@ -21,7 +21,7 @@ module ESearchy
       end
       
       def run
-        if @options[:query] != ""
+        if @options[:query] != "" and @options[:query] != nil
           Display.msg "[ '+' => New, '=' => Existing ]"
           if @options[:url] != ""
             Spidr.site(@options[:url]) do |spider|

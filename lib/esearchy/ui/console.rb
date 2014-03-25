@@ -26,6 +26,7 @@ module ESearchy
 	  		                  %w{name domain url company person name middle last email emails } + 
 	  		                  %w{persons start stop nickname format export}
 	  		ESearchy::PLUGINS.each_key {|p| common_commands << p}
+        Project.all.each {|x| common_commands << x['name']}
 
 	  		comp = proc do |s| 
 	        case s

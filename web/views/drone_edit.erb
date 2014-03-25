@@ -1,0 +1,20 @@
+<form id="edit_create" action="/drones/save" method="post">
+	<input type="hidden" id="drone_id" name="id" value="<%= @drone['_id']%>">
+	<p>
+  	<label for="drone_name">Drone Name: </label>
+  	<input type="text" id="drone_name" name="drone[name]" value="<%= @drone['name']%>">
+  </p>
+  <p>
+  	<label for="drone_hostname">Drone URL: </label>
+  	<input type="text" id="drone_hostname" name="drone[hostname]" value="<%= @drone['hostname']%>" >
+  </p>
+  <p>
+  	<label for="drone_username">Drone Username: </label>
+  	<input type="text" id="drone_username" name="drone[username]" value="<%= @drone['username']%>" >
+  </p>
+  <p>
+  	<label for="drone_password">Drone Password: </label>
+  	<input type="password" id="drone_password" name="drone[password]" value="<%= @drone['password']%>">
+  </p>
+  <p><input class="btn" type="submit" value="Save"></p>
+</form>

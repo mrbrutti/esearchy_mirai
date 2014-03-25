@@ -5,6 +5,8 @@ class Project
   key :domain, String
   key :url, String
   key :company, String
+  key :created_at, Time
+  key :updated_at, Time
 
   many :emails 
   many :persons
@@ -58,4 +60,27 @@ class Document
   key :url, String
   key :found_by, Array
 
+end
+
+class PluginRun
+  include MongoMapper::Document
+
+  key :hostname, String
+  key :plugin, String
+  key :status, String
+  key :created_at, Time
+  key :stop_at, Time
+  key :options, Hash
+  key :project, String
+  key :error, String
+  key :error_details, String
+end
+
+class Drone
+  include MongoMapper::Document
+
+  key :name, String
+  key :hostname, String
+  key :username, String
+  key :password, String
 end

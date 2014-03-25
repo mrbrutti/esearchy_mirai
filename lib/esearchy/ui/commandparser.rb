@@ -30,6 +30,23 @@ module ESearchy
 			
 			end
 			
+			def cmd_backtrace(args)
+				begin
+					if args != [] || args != nil
+						if args[0] == "on"
+							$backtrace = true
+						elsif args[0] == "off"
+							$backtrace = false
+						end	
+					else
+						Display.error "Need to provide an option [on|off]"
+					end
+				rescue Exception => e
+					Display.error "Something went wrong running the command."
+				end 
+			
+			end
+
 			#
 			# Command: use
 			# Description: Command to actually open a plugin. 
@@ -55,12 +72,44 @@ module ESearchy
 				begin
 				  if $running_context.class == ESearchy::UI::Console
 				    Display.error "Not within a plugin. Select one and then run :)"
-				  else  
+				  else
+				  	# Add run State to plugin.
+				  	run_state = PluginRun.new  :hostname => $hostname,
+				  							   :plugin 	=> $running_context.nombre, 
+				  							   :status 	=> "RUNNING", 
+				  							   :options => $running_context.options,
+				  							   :project => $running_context.options[:name],
+				  							   :error => nil, :error_details => nil,
+				  							   :created_at => Time.now 
+				  	run_state.save
+
+				  	#run the plugin :)
 				    $running_context.run
 				    $running_context.options[:start] = 0
+				    
+				    # Add successful_db_state to plugin.
+				    run_state.stop_at = Time.now
+				    if $running_context.options[:error] != nil
+				    	run_state.status = "FAILED"
+				    	run_state.error = $running_context.options[:error]
+						run_state.error_details = $running_context.options[:error_details]
+				    else
+				    	run_state.status = "DONE"
+				    end
+				    run_state.save
+				    $running_context.options[:error] = nil
+				    $running_context.options[:error_details] = nil
 			    end
 				rescue Exception => e
-  					Display.error "Something went wrong loading the plugin. #{e}"
+					# Save bad state to DB. 
+					run_state.status = "FAILED"
+					run_state.stop_at = Time.now
+					run_state.error = e.to_s
+					run_state.error_details = e.backtrace.join("\n")
+					run_state.save
+					# Display error
+  					Display.error "Something went wrong running the plugin. #{e}"
+  					Display.backtrace e.backtrace
   				end
   			end
 			#
@@ -94,7 +143,7 @@ module ESearchy
 			# Command Show Helper method. 
 			#
 			def show_variables(options={}, key=[])
-				if key = []
+				if key == []
 					Display.hash(options)
 				else
 					search_terms = keys.join("|").to_s

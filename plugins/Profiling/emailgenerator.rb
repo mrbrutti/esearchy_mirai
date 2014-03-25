@@ -61,7 +61,7 @@ module ESearchy
             end
           end
         rescue Exception => e
-          Display.error "Something went wrong. #{e}" 
+          handle_error :error => e 
         end
       end
     end

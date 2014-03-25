@@ -1,12 +1,29 @@
 # encoding: UTF-8
+require 'geokit'
+
+Geokit::Geocoders::google = "AIzaSyAXSzCJBDU6H2LSYM_SAyMOrKTigAhA4ZE"
 
 module ESearchy
 	module Parsers
 		module People
 
 			def ziggs(profile)
-				doc = Nokogiri::HTML(open(profile))
-				links = Nokogiri::HTML(open(profile.gsub('/Background/', "/Links/")))
+				begin
+          search = open(profile)
+        rescue Exception => e
+          Display.error "There was an error opening the Ziggs Profile #{e}"
+          return {}
+        end
+				doc = Nokogiri::HTML(search)
+
+				begin
+          search = open(profile.gsub('/Background/', "/Links/"))
+        rescue Exception => e
+          Display.error "There was an error opening the Ziggs Links Profile #{e}"
+          return {}
+        end
+				links = Nokogiri::HTML(search)
+
 				begin
 					if get_info(doc.search('span[@id="ctl00_ContentPlaceHolder1_MemberImageCard1_lblCompany"]')).strip.match(/#{@options[:company]}/i) != nil
 						person = {}
@@ -16,10 +33,19 @@ module ESearchy
 						person[:title] = get_info(doc.search('span[@id="ctl00_ContentPlaceHolder1_MemberImageCard1_lblTitle"]'))
 						person[:company] = @options[:company]
 						person[:photo] = get_info(doc.search('img[@id="ctl00_ContentPlaceHolder1_MemberImageCard1_imgMember"]'))
-						person[:city], person[:state] = get_info(doc.search('span[@id="ctl00_ContentPlaceHolder1_MemberImageCard1_lblLocation"]')).split(",")
+						person[:location] = get_info(doc.search('span[@id="ctl00_ContentPlaceHolder1_MemberImageCard1_lblLocation"]'))
+						if person[:location].strip != "" and person[:location] != nil
+							geoloc = Geokit::Geocoders::MultiGeocoder.geocode(person[:location]).ll
+							if geoloc != ","
+								person[:geolocation] = geoloc
+							else
+								geoloc = Geokit::Geocoders::GoogleGeocoder3.geocode(person[:location]).ll
+								person[:geolocation] = geoloc if geoloc != ","
+							end
+						end
 						#Fetch resume URL if a resume doc is posted.
 						resume = doc.search('a[@id="ctl00_ContentPlaceHolder1_lnkResumeName"]')		  
-		  			person[:resume] = resume[0]['href'] unless resume.empty?
+		  				person[:resume] = resume[0]['href'] unless resume.empty?
 						# Work History
 						person[:workhistory] = get_info(doc.search('div[@id="ctl00_ContentPlaceHolder1_divWork"]')).split(/[\r\n\t\t\t\t\t\t]+/).map {|x| x.strip}.select {|x| x != ""}
 						# School History
@@ -40,7 +66,13 @@ module ESearchy
 				if profile.match(/\/about/) == nil
 					profile += "/about"
 				end
-				doc = Nokogiri::HTML(open(profile))
+				begin
+          search = open(profile)
+        rescue Exception => e
+          Display.error "There was an error opening the Google+ Profile #{e}"
+          return {}
+        end
+				doc = Nokogiri::HTML(search)
 				begin
 					if get_info(doc.search('ul[@class="FLMe8d"]')).strip.match(/#{@options[:company]}/i) != nil
 						person = {}
@@ -49,9 +81,17 @@ module ESearchy
 						person[:last] = name_last.last
 						person[:title] = get_info(doc.search('div[@class="aYm0te c-wa-Da title"]'))
 						person[:company] = @options[:company]
-						person[:city] = get_info(doc.search('div[@class="adr"]'))
-		  				person[:gender] = get_info(doc.search('div[@class="kM5Oeb-fYiPJe KtnyId IzbGp"]')).gsub("Gender","") 
-		  				person[:photo] = get_info(doc.search('img[@class="l-tk photo"]'))
+						person[:location] = get_info(doc.search('div[@class="adr"]'))
+						if person[:location].strip != "" and person[:location] != nil
+							if geoloc != ","
+								person[:geolocation] = geoloc
+							else
+								geoloc = Geokit::Geocoders::GoogleGeocoder3.geocode(person[:location]).ll
+								person[:geolocation] = geoloc if geoloc != ","
+							end
+						end
+		  			person[:gender] = get_info(doc.search('div[@class="kM5Oeb-fYiPJe KtnyId IzbGp"]')).gsub("Gender","") 
+		  			person[:photo] = get_info(doc.search('img[@class="l-tk photo"]'))
 						work_edit = doc.search('ul[@class="FLMe8d"]')
 						# Work History
 						if work_edit[0] != nil
@@ -91,7 +131,14 @@ module ESearchy
 			end
 
 			def classmates(profile)
-				doc = Nokogiri::HTML(open(profile))
+				begin
+          search = open(profile)
+        rescue Exception => e
+          Display.error "There was an error opening the Classmates Profile #{e}"
+          return {}
+        end
+				doc = Nokogiri::HTML(search)
+
 				begin
 					if get_info(doc.search('div[@id="storyPartialView"]')).split("Biography:")[1].strip.match(/#{@options[:company]}/i) != nil
 						person = {}
@@ -100,7 +147,16 @@ module ESearchy
 						information = get_info(doc.search('div[@id="c:SEOMemberBasicInfo"]'))
 						person[:school] = information.split("High School")[0]
 						person[:yeargrad] = information.split("High School")[1].split("Class of ")[1].split("Member Since: ")[0].strip.to_i
-						person[:city], person[:state] = information.split("High School")[1].split("Class")[0].strip.split(", ")
+						person[:location] = information.split("High School")[1].split("Class")[0].strip
+						if person[:location].strip != "" and person[:location] != nil
+							geoloc = Geokit::Geocoders::MultiGeocoder.geocode(person[:location]).ll
+							if geoloc != ","
+								person[:geolocation] = geoloc
+							else
+								geoloc = Geokit::Geocoders::GoogleGeocoder3.geocode(person[:location]).ll
+								person[:geolocation] = geoloc if geoloc != ","
+							end
+						end
 						person[:company] = @options[:company]
 						person[:communities] = get_info(doc.search('ul[@class="botMargin1"]')).split(")").map {|x| x.strip + ")"}
 						person[:photo] = get_info(doc.search('div[@class"space1marT"'))
@@ -114,7 +170,13 @@ module ESearchy
 			end
 			
 			def linkedin(profile)
-				doc = Nokogiri::HTML(open(profile))
+				begin
+          search = open(profile)
+        rescue Exception => e
+          Display.error "There was an error opening the LinkedIn Profile #{e}"
+          return {}
+        end
+				doc = Nokogiri::HTML(search)
 				begin
 					if get_info(doc.search('p[@class="headline-title title"]')).match(/#{@options[:company]}/i) != nil
 						person = {}
@@ -122,6 +184,15 @@ module ESearchy
 						person[:last] = get_info(doc.search('span[@class="family-name"]'))
 						person[:title] = get_info(doc.search('p[@class="headline-title title"]'))
 						person[:location] = get_info(doc.search('dd[@class="locality"]'))
+						if person[:location].strip != "" and person[:location] != nil
+							geoloc = Geokit::Geocoders::MultiGeocoder.geocode(person[:location]).ll
+							if geoloc != ","
+								person[:geolocation] = geoloc
+							else
+								geoloc = Geokit::Geocoders::GoogleGeocoder3.geocode(person[:location]).ll
+								person[:geolocation] = geoloc if geoloc != ","
+							end
+						end
 						person[:photo] = doc.search('div[@class="image zoomable"]').search('img[@class="photo"]')[0] == nil ? 
 							nil : 
 							doc.search('div[@class="image zoomable"]').search('img[@class="photo"]')[0].attributes["src"].value
@@ -140,8 +211,47 @@ module ESearchy
 				
 			end
 
-			def jigsaw
-				
+			def jigsaw(profile)
+				begin
+          search = open(profile)
+        rescue Exception => e
+          Display.error "There was an error opening the Jigsaw Profile #{e}"
+          return {}
+        end
+				doc = Nokogiri::HTML(search)
+
+				begin
+					if get_info(doc.search('div[@class="businesscard-companyinfo-name"]')).match(/#{@options[:company]}/i) != nil
+						person = {}
+						name_last = get_info(doc.search('div[@class="businesscard-contactinfo-name"]')).split(" ")
+						person[:name] = name_last[0..-2].join(" ")
+						person[:last] = name_last[-1]
+						person[:title] = get_info(doc.search('div[@class="businesscard-contactinfo-title"]'))
+						person[:location] = get_info(doc.search('div[@class="businesscard-companyinfo-addressline"]'))
+						person[:location] << " " + get_info(doc.search('div[@class="businesscard-companyinfo-citystatezip"]')).gsub("  ", "").gsub("\r\n", " ").strip
+						person[:location] << " " + get_info(doc.search('div[@class="businesscard-companyinfo-country"]'))
+						if person[:location].strip != "" and person[:location] != nil
+							geoloc = Geokit::Geocoders::MultiGeocoder.geocode(person[:location]).ll
+							if geoloc != ","
+								person[:geolocation] = geoloc
+							else
+								Display.error "Using Googlev3 GeoCoders"
+								geoloc = Geokit::Geocoders::GoogleGeocoder3.geocode(person[:location]).ll
+								person[:geolocation] = geoloc if geoloc != ","
+							end
+						end
+						person[:photo] = nil
+						person[:company] = @options[:company]
+						return person
+					else
+						Display.debug "Company does not match."
+						return {}
+					end
+				rescue Exception => e
+					Display.error "There was an error parsing the Jigsaw Profile #{e}"
+					Display.backtrace e.backtrace
+					return {}
+				end
 			end
 
 			def plaxo
@@ -153,7 +263,13 @@ module ESearchy
 			end
 
 			def spoke(profile)
-				doc = Nokogiri::HTML(open(profile))
+				begin
+          search = open(profile)
+        rescue Exception => e
+          Display.error "There was an error opening the Spoke Profile #{e}"
+          return {}
+        end
+				doc = Nokogiri::HTML(search)
 				Display.debug profile
 				begin
 					company = get_info(doc.search('h3[@class="fn"]'))
@@ -171,12 +287,13 @@ module ESearchy
 						return {}
 					end
 				rescue Exception => e
-					Display.debug "Error in Spoke " + e
+					Display.debug "Error in Spoke " + e.to_s
 					return {}
 				end
 			end
 
 			private
+
 			def get_info(res)
 				res[0] == nil ? "" : res[0].text.strip
 			end

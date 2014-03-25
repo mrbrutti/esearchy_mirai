@@ -41,9 +41,7 @@ module ESearchy
       private
       def parse( results )
         Display.debug "Parsing #{results.size} for Ziggs data."
-        ts = []
         results.each do |result|
-          ts << Thread.new {
             begin
               name_last = result[:title].scan(/[\w\s]* -/)[0]
               if name_last != nil && name_last != " |"
@@ -94,11 +92,11 @@ module ESearchy
                 end
               end
             rescue Exception => e
-              Display.debug "Something went wrong." + e
+              handle_error :error => e
             end
-          }
+        
         end
-        ts.each {|t| t.join }
+        
         return nil
       end
 

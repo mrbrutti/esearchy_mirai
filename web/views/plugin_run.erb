@@ -1,0 +1,45 @@
+<form id="plugin_run" action="/drones/<%= @drone_id%>/plugins/<%= @plugin_id%>/run" method="post">
+  <input type="hidden" id="drone_id" name="id" value="<%= @drone_id%>">
+	<input type="hidden" id="plugin_name" name="pname" value="<%= @plugin_id%>">
+	<p>
+  	<label for="options_company">Company Name: </label>
+  	<input type="text" id="options_name" name="options[name]" value="<%= @options['name']%>">
+  </p>
+  <p>
+  	<label for="options_query">Company URL: </label>
+  	<input type="text" id="options_hostname" name="options[query]" value="<%= @options['hostname']%>" >
+  </p>
+  <p>
+  	<label for="options_start">Start: </label>
+    <select type="text" id="optionse_start" name="options[start]" >
+      <option value="0">0</option>
+      <option value="100">100</option>
+      <option value="200">200</option>
+      <option value="300">300</option>
+      <option value="400">400</option>
+      <option value="500">500</option>
+      <option value="600">600</option>
+      <option value="700">700</option>
+      <option value="800">800</option>
+      <option value="900">900</option>
+      <option value="1000">1000</option>
+    </select>
+  </p>
+  <p>
+  	<label for="options_stop">Stop: </label>
+    <select type="text" id="options_stop" name="options[stop]" >
+      <option value="0">0</option>
+      <option value="100">100</option>
+      <option value="200">200</option>
+      <option value="300">300</option>
+      <option value="400">400</option>
+      <option value="500">500</option>
+      <option value="600">600</option>
+      <option value="700">700</option>
+      <option value="800">800</option>
+      <option value="900">900</option>
+      <option value="1000" selected='selected'>1000</option>
+    </select>
+  </p>
+  <p><input class="btn" type="submit" value="Run"></p>
+</form>
