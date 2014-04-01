@@ -1,26 +1,23 @@
-esearchy_mirai
-==============
+# esearchy_mirai
+
 
 Esearchy 0.3 Codename: Mirai. This is a complete re-write from esearchy-ng. 
-
 This is where I should put the interesting how-to info, but for now.
 
-SETUP THE ENVIRONMENT:
+Quick Setup of the environment:
 
 ```bash
 ruby setup.rb
-
 cd bin
-
 ./esearchy 
 ```
 
 and enjoy
 
 
-# Development
+## Development
 
-## Sample script
+### Sample script
 ```ruby
 module ESearchy  
   # This is mainly to separate plugins into catogagories. Current ones are
@@ -78,9 +75,9 @@ end
 
 In order to develop new features for esearchy here are a few things to take into account.
 
-## Objects
+### Objects
 
-## Company object
+##### Company object
 ```json 
 {
     "_id" : ObjectId(),
@@ -94,7 +91,7 @@ In order to develop new features for esearchy here are a few things to take into
 }
 ```
 
-## Person object
+##### Person object
 ```json
 {
     "_id" : ObjectId(),
@@ -123,7 +120,7 @@ In order to develop new features for esearchy here are a few things to take into
 }
 ```
 
-#Networks
+##### Networks
 The network objects contain a _url_ where it was found, a _nickname_ for the person network, where it was found _found\_by_ , the usual timestamps (created_at,updated_at) and most importantly _info_ which contains all of the specific network fields as it is shown on the screenshot below. 
 ```json
 {
@@ -145,7 +142,7 @@ The network objects contain a _url_ where it was found, a _nickname_ for the per
 }
 ```
 
-#Emails
+##### Emails
 ```json
 {
     "_id" : ObjectId(),
@@ -157,7 +154,7 @@ The network objects contain a _url_ where it was found, a _nickname_ for the per
 }
 ```
 
-#Documents
+##### Documents
 ```json
 {
     "_id" : ObjectId(),
@@ -181,7 +178,7 @@ The network objects contain a _url_ where it was found, a _nickname_ for the per
 }
 ```
 
-#Plugin History
+##### Plugin History
 ```json
 { 
     "_id" : ObjectId( "513648e8c1806b83d7000006" ),
