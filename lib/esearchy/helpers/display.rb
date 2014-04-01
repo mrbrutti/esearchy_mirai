@@ -1,7 +1,16 @@
+require 'command_line_reporter'
+
+include CommandLineReporter
+
 class Display
+  
   COLOR_CODE = "\e"
   if  RUBY_PLATFORM =~ /mingw|mswin/
     require 'win32console'
+  end
+
+  def self.underline
+    COLOR_CODE + "[4m" + COLOR_CODE + "[1m"
   end
 
   def self.red
@@ -86,24 +95,114 @@ class Display
   end
 
 
+  def self.plugins(s)
+    table(:border => false) do
+      row(:color => 'red', :header => true, :bold => true) do
+        column('NAME', :width => 20)
+        column('TYPE', :width => 15)
+        column('DESCRIPTION', :width => (ENV['COLUMNS'].to_i - 45))
+      end
+      s.each do |plugin|
+        row(:color => 'blue') do
+          column(plugin[0])
+          column(plugin[1].to_s.split("::")[1])
+          column(plugin[1].new.desc)
+        end
+      end
+    end
+  end
+
+  def self.projects(p)
+    table(:border => false) do
+      row(:color => 'red', :header => true, :bold => true) do
+        column('NAME', :width => 15)
+        column('COMPANY', :width => 35)
+        column('EMAILS', :width => 10)
+        column('PERSONS', :width => 10)
+        column('CREATED', :width => 10)
+        column('UPDATED', :width => 10)
+      end
+      p.each do |project|
+        row(:color => 'blue') do
+          column(project.name)
+          column(project.company)
+          column(project.emails.size)
+          column(project.persons.size)
+          column(project.created_at == nil ? "--" : project.created_at.strftime("%m-%d-%Y"))
+          column(project.updated_at == nil ? "--" : project.updated_at.strftime("%m-%d-%Y"))
+        end
+      end
+    end
+  end
+
+  def self.persons(p)
+    table(:border => false) do
+      row(:color => 'red', :header => true, :bold => true) do
+        column('NAME', :width => 12)
+        column('LAST', :width => 15)
+        column('TITLE', :width => (ENV['COLUMNS'].to_i - 72))
+        column('FOUND_BY', :width => 10)
+        column('NETs', :width => 5)
+        column('@s', :width => 5)
+        column('CREATED', :width => 10)
+      end
+      p.each do |person|
+        row(:color => 'blue') do
+          column(person.name)
+          column(person.last)
+          column(person.networks[0]["info"]["title"])
+          column(person.found_by.join(" "))
+          column(person.networks.size)
+          column(person.emails.size)
+          column(person.created_at == nil ? "--" : person.created_at.strftime("%m-%d-%Y"))
+        end
+      end
+    end
+  end
+
+  def self.emails(e)
+    table(:border => false) do
+      row(:color => 'red', :header => true, :bold => true) do
+        column('EMAIL', :width => 30)
+        column('FOUND_BY', :width => 15)
+        column('URL', :width => (ENV['COLUMNS'].to_i - 60))
+      end
+      e.each do |email|
+        row(:color => 'blue') do
+          column(email.email)
+          column(email.found_by.join(" "))
+          column(email.url)
+        end
+      end
+    end
+  end
 
   def self.hash(opt = {})
-    opt.each do |k,v|
-      case v
-      when String
-        val = v
-      when Fixnum
-        val = v.to_s
-      when Array
-        val = "[" + v.join(", ") + "]"
-      when Hash
-        val = "{\n" + v.map { |x| "\t" + x.join(" => ")}.join(",\n ") + "\n}"
-      when nil
-        val = ""
-      else
-        val = v.to_s
+    table(:border => false) do
+      row(:color => 'red', :header => true, :bold => true) do
+        column('KEY', :width => 15)
+        column('VALUE', :width => (ENV['COLUMNS'].to_i - 25))
       end
-      print yellow + "#{k}" + default + "\t\=\t#{val}"
+      opt.each do |k,v|
+        case v
+        when String
+          val = v
+        when Fixnum
+          val = v.to_s
+        when Array
+          val = "[" + v.join(", ") + "]"
+        when Hash
+          val = "{\n" + v.map { |x| "\t" + x.join(" => ")}.join(",\n ") + "\n}"
+        when nil
+          val = ""
+        else
+          val = v.to_s
+        end
+        row(:color => 'blue') do
+          column(k, {:bold => true, :color => 'white'})
+          column((val == nil || val.strip == "") ? "--" : val)
+        end
+      end
     end
   end
 end

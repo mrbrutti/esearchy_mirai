@@ -1,7 +1,9 @@
 # encoding: UTF-8
 require 'geokit'
 
-Geokit::Geocoders::google = "AIzaSyAXSzCJBDU6H2LSYM_SAyMOrKTigAhA4ZE"
+#Geokit::Geocoders::google = "AIzaSyAXSzCJBDU6H2LSYM_SAyMOrKTigAhA4ZE"
+Geokit::Geocoders::provider_order = [:google,:us]
+Geokit::Geocoders::ip_provider_order = [:external,:geo_plugin,:ip]
 
 module ESearchy
 	module Parsers

@@ -35,7 +35,8 @@ module ESearchy
                                             :url => result[:url],  
                                             :nickname => nick, 
                                             :info => info, 
-                                            :found_by => @info[:name]}) 
+                                            :found_by => @info[:name],
+                                            :created_at => Time.now}) 
             Display.msg "[SocialProfiling] - ++ #{network_name}"
             person.save
           end

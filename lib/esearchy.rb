@@ -4,7 +4,7 @@ require 'net/http'
 require 'cgi'
 require 'uri'
 require 'digest/sha2'
-
+require 'command_line_reporter'
 
 #External Gems
 require 'json'
@@ -22,7 +22,7 @@ end
 
 PATH ||= 'esearchy/'
 #ESEARCHY REQUIRES
-['db/db','db/mapper', 'helpers/display', 'helpers/useragent', 'helpers/search','esearchy', 'baseplugin',
+['db/db', 'db/redis','db/mapper', 'helpers/display', 'helpers/useragent', 'helpers/search','esearchy', 'baseplugin',
   'ui/common', 'ui/commandparser', 'ui/command/project', 'ui/command/person','ui/console', 'parsers/people', 
   'parsers/email', 'parsers/document', 'helpers/discover'].each {|x| require_relative PATH + x }
 

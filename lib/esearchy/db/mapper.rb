@@ -5,6 +5,7 @@ class Project
   key :domain, String
   key :url, String
   key :company, String
+  key :queries, Array
   key :created_at, Time
   key :updated_at, Time
 
@@ -19,6 +20,7 @@ class Person
   key :middle,  String
   key :last,  String
   key :created_at, Time
+  key :updated_at, Time
   key :friend_ids, Array
   key :found_at, Array
   key :found_by, Array
@@ -37,6 +39,7 @@ class Network
   key :nickname, String
   key :found_by, Array
   key :info, Hash
+  key :created_at, Time
   
   belongs_to :person
 end
@@ -47,6 +50,7 @@ class Email
   key :email, String
   key :url, String
   key :found_by, Array
+  key :created_at, Time
 
   belongs_to :project
   belongs_to :person
@@ -59,6 +63,7 @@ class Document
   key :format, String
   key :url, String
   key :found_by, Array
+  key :created_at, Time
 
 end
 
@@ -83,4 +88,6 @@ class Drone
   key :hostname, String
   key :username, String
   key :password, String
+  key :created_at, Time
+  key :updated_at, Time
 end

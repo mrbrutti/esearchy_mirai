@@ -28,12 +28,11 @@ load_custom_templates
 read_config
 ESearchy::DB.start
 ESearchy::DB.connect
-#ESearchy::DB.redis
+#ESearchy::Redis.start
 
 Resque.redis = Redis.new
 
 class EsearchyDrone  < Sinatra::Base
-	#register Sinatra::Synchrony
 
 	get '/status' do
 		content_type :json

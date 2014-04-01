@@ -129,11 +129,7 @@ module ESearchy
 			#			
 			def cmd_project_list(args)
 				begin
-					Project.all.each do |project|
-						Display.msg "PROJECT: #{project.name}"
-						Display.print "Employees\t= " + project.persons.size.to_s
-						Display.print "Emails\t= " + project.emails.size.to_s
-					end
+					Display.projects Project.all
 				rescue Exception => e
 					Display.error "Something went wrong running the command." + e
 				end
@@ -157,15 +153,10 @@ module ESearchy
 							Display.print Display.yellow + "Emails" + Display.default + "\t\t=\t" + project.emails.size.to_s
 						elsif args[0] =~ /email/
 							Display.msg "EMAIL INFORMATION"
-							project.emails.each do |email|
-								Display.print email.email.to_s
-							end
-							Display.msg "Total emails: #{project.emails.size}"
+							Display.emails project.emails
 						elsif args[0] =~ /person/
 							Display.msg "PERSONS INFORMATION"
-							project.persons.each do |p|
-								Display.print "#{p.name} #{p.last} \e[31m|\e[0m #{p.networks.size} Networks \e[31m|\e[0m #{p.emails.size} Emails"
-							end
+							Display.persons project.persons
 						else
 							Display.error "Unrecognize option [#{args[0]}]."
 						end

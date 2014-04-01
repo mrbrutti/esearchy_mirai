@@ -59,9 +59,12 @@ module ESearchy
                         employee.name = name
                         employee.last = last
                         employee.created_at = Time.now
+                        employee.updated_at = Time.now
                         employee.found_by = @info[:name]
                         employee.found_at = result[:url]
-                        employee.networks << Network.new({:name => "LinkedIn", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
+                        employee.networks << Network.new({:name => "LinkedIn", :url => result[:url], 
+                                                          :nickname => name+last, :info => info, 
+                                                          :found_by => @info[:name], :created_at => Time.now})
                         @project.persons << employee
                         @project.save
                         Display.msg "[LinkedIn] + " + name + " " + last
@@ -69,7 +72,9 @@ module ESearchy
                         employee = new_empl.first
                         if networks_exist?(employee.networks, "LinkedIn")
                           Display.msg "[LinkedIn] < " + name + " " + last
-                          employee.networks << Network.new({:name => "LinkedIn", :url => result[:url], :nickname => name+last, :info => info, :found_by => @info[:name]})
+                          employee.networks << Network.new({:name => "LinkedIn", :url => result[:url], 
+                                                            :nickname => name+last, :info => info, 
+                                                            :found_by => @info[:name], :created_at => Time.now})
                           employee.found_by << @info[:name]
                           employee.save!
                           @project.save

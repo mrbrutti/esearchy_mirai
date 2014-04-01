@@ -59,10 +59,12 @@ module ESearchy
                           employee.name = name
                           employee.last = last
                           employee.created_at = Time.now
+                          employee.updated_at = Time.now
                           employee.found_by = @info[:name]
                           employee.found_at = result[:url]
                           employee.networks << Network.new({:name => "Ziggs", :url => result[:url], 
-                                                            :nickname => result[:url].split("regId=")[1], :info => info})
+                                                            :nickname => result[:url].split("regId=")[1], 
+                                                            :info => info, :created_at => Time.now})
                           if info[:links] != []
                             parse_links(info[:links]).each {|x| employee.networks << x }
                           end
@@ -74,7 +76,8 @@ module ESearchy
                           if networks_exist?(employee.networks, "Ziggs")
                             Display.msg "[Ziggs] < " + name + " " + last
                             employee.networks << Network.new({:name => "Ziggs", :url => result[:url], 
-                                                              :nickname => result[:url].split("regId=")[1], :info => info})
+                                                              :nickname => result[:url].split("regId=")[1], 
+                                                              :info => info, :created_at => Time.now})
 
                             if info[:links] != []
                               parse_links(info[:links]).each {|x| employee.networks << x }

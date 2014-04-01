@@ -60,10 +60,13 @@ module ESearchy
                         employee.name = name
                         employee.last = last
                         employee.created_at = Time.now
+                        employee.updated_at = Time.now
                         employee.found_by = @info[:name]
                         employee.found_at = result[:url]
                         employee.networks << Network.new({:name => "Classmates", :url => result[:url], 
-                                                          :nickname => result[:url].split("regId=")[1], :info => info, :found_by => @info[:name]})
+                                                          :nickname => result[:url].split("regId=")[1], 
+                                                          :info => info, :found_by => @info[:name],
+                                                          :created_at => Time.now})
                         @project.persons << employee
                         @project.save
                         Display.msg "[Classmates] + " + name + " " + last
@@ -72,7 +75,9 @@ module ESearchy
                         if networks_exist?(employee.networks, "Classmates")
                           Display.msg "[Classmates] < " + name + " " + last
                           employee.networks << Network.new({:name => "Classmates", :url => result[:url], 
-                                                            :nickname => result[:url].split("regId=")[1], :info => info, :found_by => @info[:name]})
+                                                            :nickname => result[:url].split("regId=")[1], 
+                                                            :info => info, :found_by => @info[:name],
+                                                            :created_at => Time.now})
                           employee.found_by << @info[:name]
                           employee.save!
                           @project.save

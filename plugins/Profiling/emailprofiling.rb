@@ -42,7 +42,7 @@ module ESearchy
                       correo.downcase!
                       if correo.match(/.*@*\.#{@options[:query].gsub(/.*\@/,"")}/) != nil || correo.match(/.*@#{@options[:query].gsub(/.*\@/,"")}/) !=nil
                         if email_exist?(correo)
-                          person.emails << Email.new({:email => correo, :url => result[:url], :found_by => @info[:name]})
+                          person.emails << Email.new({:email => correo, :url => result[:url], :found_by => @info[:name], :created_at => Time.now})
                           @project.save!
                           Display.msg "[EmailProfiling] + " + correo
                         else

@@ -45,7 +45,7 @@ module ESearchy
                   end 
                   if email_exist?(email)
                     Display.msg "[EmailGenerator] + " + email
-                    person.emails << Email.new({ :email => email, :url => person.found_at, :found_by => @info[:name] })
+                    person.emails << Email.new({ :email => email, :url => person.found_at, :found_by => @info[:name], :created_at => Time.now})
                     person.save!
                     person.save
                     @project.save

@@ -1,6 +1,7 @@
 module ESearchy
 	module UI
 		module CommandParser
+			
 			#
 			# Command: Meta_cmd 
 			# Description: This is the meta handler for all commands. 
@@ -123,15 +124,15 @@ module ESearchy
 				 	case type 
 				 	when "globals"
 				 		Display.msg "GLOBALS"
-				 		Display.msg "Name\t\tValue"
+				 		#Display.msg "Name\t\tValue"
 				 		show_variables $globals, args[1..-1]
 					when "options"
 						Display.msg "OPTIONS " + "[#{$running_context.nombre}]"
-				 		Display.msg "Name\t\tValue"
+				 		#Display.msg "Name\t\tValue"
 						show_variables $running_context.options, args[1..-1]
 					when "constants"
 				 		Display.msg "CONSTANTS " + "[#{$running_context.nombre}]"
-				 		Display.msg "Name\t\tValue"						
+				 		#Display.msg "Name\t\tValue"						
 						show_variables $running_context.info, args[1..-1]
 					end
 				rescue Exception => e
@@ -187,12 +188,13 @@ module ESearchy
 				begin
 					Display.msg "HELP"
 					if args == nil || args == []
-						Display.msg "Commands"
+						Display.msg "COMMANDS"
 						help_commands
 						Display.help "TODO"
-						Display.msg "Plugins"
+						Display.msg "PLUGINS"
 						if $running_context.nombre == ""
-							ESearchy::PLUGINS.each_value {|v| v.new.help }
+							sorted = ESearchy::PLUGINS.sort_by { |k,v| v.to_s }
+							Display.plugins(sorted)
 						else
 							$running_context.help
 						end
@@ -264,12 +266,7 @@ module ESearchy
 					else
 						Display.msg "LIST PLUGINS"
 						sorted = ESearchy::PLUGINS.sort_by { |k,v| v.to_s }
-						Display.msg "Name\t\tType\t\t Description"
-						sorted.each do |plugin|
-							name = plugin[0].size > 8 ? "#{plugin[0]}\t" : "#{plugin[0]}\t\t"
-	 						desc = plugin[1].new.desc
-	 						Display.print "#{name}" +  "| #{plugin[1].to_s.split("::")[1]}\t | #{desc.size > 60 ? desc[0..60] + "..." : desc}"
-						end
+						Display.plugins(sorted)
 					end
 				rescue Exception => e
 					Display.error "Something went wrong running the command." + e
@@ -292,12 +289,7 @@ module ESearchy
 		 				end
 		 				sorted = selected.sort_by { |k,v| v.to_s } 
 		 				Display.msg "SEARCH RESULTS"
-		 				Display.msg "Name\t\tType\t\t Description"
-		 				sorted.each do |plugin|
-		 					name = plugin[0].size > 8 ? "#{plugin[0]}\t" : "#{plugin[0]}\t\t"
-		 					desc = plugin[1].new.desc
-		 					Display.print "#{name}" +  "| #{plugin[1].to_s.split("::")[1]}\t | #{desc.size > 60 ? desc[0..60] + "..." : desc}"
-		 				end
+		 				Display.plugins(sorted)
 		 			else
 		 				Display.error "Need to provide a search argument [search plugin_name]"
 		 			end
@@ -306,12 +298,11 @@ module ESearchy
 		 		end 
 		 	end
 
-
-				#
-				# Command: show
-				# Description: This should show globals options, instance options, plugin options.
-				# and plugion constants
-				#			
+			#
+			# Command: show
+			# Description: This should show globals options, instance options, plugin options.
+			# and plugion constants
+			#			
 			def cmd_edit(args)
 				begin
 					if args == nil || args == []

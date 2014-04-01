@@ -7,6 +7,7 @@ require 'geokit'
 require 'cgi'
 require 'rack'
 require 'rest-client'
+require 'puma'
 
 require_relative "../lib/esearchy"
 
@@ -47,6 +48,8 @@ end
 esearchydb = Connection.new.db('esearchy')
 set :views, File.dirname(__FILE__) + "/../web/views"
 set :public_folder, File.dirname(__FILE__) + '/../web/static'
+set :server, :puma
+set :force_ssl, true
 
 set :drone_list, Proc.new { esearchydb.collection('drones').find.map {|x| [x['name'],x['_id']]} }
 set :project_list, Proc.new { esearchydb.collection('projects').find({}, :sort => ['updated_at', Mongo::DESCENDING], :limit => 5).map {|x| [x['name'],x['_id']]} }
@@ -202,7 +205,9 @@ get '/projects/new' do
 	erb :company_edit, :layout => false 
 end
 
-post '/projects/create' do 
+post '/projects/create' do
+	params[:project][:created_at] = Time.now
+	params[:project][:updated_at] = Time.now 
 	id = esearchydb.collection('projects').insert(params[:project])
 	redirect "/projects/#{id}/info"
 end

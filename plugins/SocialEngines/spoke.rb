@@ -60,9 +60,13 @@ module ESearchy
                           employee.name = info[:name]
                           employee.last = info[:last]
                           employee.created_at = Time.now
+                          employee.updated_at = Time.now
                           employee.found_by = @info[:name]
                           employee.found_at = result[:url]
-                          employee.networks << Network.new({:name => "Spoke", :url => result[:url], :nickname => info[:name]+info[:last], :info => info, :found_by => @info[:name]})
+                          employee.networks << Network.new({:name => "Spoke", :url => result[:url], 
+                                                            :nickname => info[:name]+info[:last], 
+                                                            :info => info, :found_by => @info[:name],
+                                                            :created_at => Time.now})
                           @project.persons << employee
                           @project.save
                           Display.msg "[Spoke] + " + info[:name] + " " + info[:last]
@@ -70,7 +74,10 @@ module ESearchy
                           employee = new_empl.first
                           if networks_exist?(employee.networks, "Spoke")
                             Display.msg "[Spoke] < " + info[:name] + " " + info[:last]
-                            employee.networks << Network.new({:name => "Spoke", :url => result[:url], :nickname => info[:name]+info[:last], :info => info, :found_by => @info[:name]})
+                            employee.networks << Network.new({:name => "Spoke", :url => result[:url], 
+                                                              :nickname => info[:name]+info[:last], 
+                                                              :info => info, :found_by => @info[:name],
+                                                              :created_at => Time.now})
                             employee.found_by << @info[:name]
                             employee.save!
                             @project.save

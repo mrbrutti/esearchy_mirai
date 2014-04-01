@@ -1,6 +1,7 @@
 require 'readline'
 require 'readline/history/restore'  unless RUBY_PLATFORM =~ /mingw|mswin/
 
+
 module ESearchy
 	module UI
 		class	Console
@@ -68,7 +69,7 @@ module ESearchy
 
       def project_context
         if @project !=nil
-          " [\e[34m#{@project.name}\e[0m] "
+          " [\e[34m#{@project.name}\e[0m]"
         end
       end
 
@@ -87,7 +88,7 @@ module ESearchy
       end
 
   		def prompt
-      	return Readline.readline("esearchy#{project_context}#{context}:> ", true).strip
+      	return Readline.readline(Display.underline + "esy" + Display.default + "#{project_context}#{context} > ", true).strip
     	end
     end
   end
